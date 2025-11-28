@@ -15,6 +15,7 @@ from classes.data_source import PlayerStats
 import utils.constants as const
 
 
+import uuid
 
 
 
@@ -83,13 +84,26 @@ class Visual:
         else:
             self.annotation_text = "<span style=''>{metric_name}: {data:.2f}</span>"
 
-    def show(self):
+    # def show(self):
+    #     st.plotly_chart(
+    #         self.fig,
+    #         config={"displayModeBar": False},
+    #         height=500,
+    #         use_container_width=True,
+    #     )
+    def show(self, key: str | None = None):
+            # If no key is provided, generate a unique one
+        if key is None:
+            key = f"{self.__class__.__name__}_{uuid.uuid4()}"
+
         st.plotly_chart(
-            self.fig,
-            config={"displayModeBar": False},
-            height=500,
-            use_container_width=True,
-        )
+                self.fig,
+                config={"displayModeBar": False},
+                height=500,
+                use_container_width=True,
+                key=key,
+            )
+
 
     def close(self):
         pass

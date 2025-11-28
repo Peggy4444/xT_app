@@ -5,7 +5,7 @@ Runs top to bottom every time the user interacts with the app (other than import
 from pathlib import Path
 import sys
 path_root = Path(__file__).parents[1]
-print(path_root)
+#print(path_root)
 sys.path.append(str(path_root))
 # Library imports
 import traceback

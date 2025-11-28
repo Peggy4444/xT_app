@@ -445,90 +445,199 @@ class PassDescription_logistic(Description):
             self.competition = competition
             super().__init__()
 
+        # def synthesize_text(self):
+
+        #     pass_data = self.pass_data
+        #     #df_contributions = self.df_contributions
+            
+        #     #for a specific pass id
+        #     passes = pass_data.df_pass[pass_data.df_pass['id'] == self.pass_id] 
+        #     contributions = pass_data.df_contributions[pass_data.df_contributions['id'] == self.pass_id]
+        #     tracking = pass_data.df_tracking[pass_data.df_tracking['id'] == self.pass_id]
+
+
+        #     if passes.empty:
+        #         #raise ValueError(f"No shot found with ID {self.shot_id}")
+        #         raise ValueError(f"No pass found with ID {self.pass_id}")
+            
+        #     player_name = passes['passer_name'].iloc[0]
+        #     team_name = passes['team_name'].iloc[0]
+        #     xT = contributions['xT'].iloc[0]
+        #     x = passes['passer_x'].iloc[0]
+        #     y = passes['passer_y'].iloc[0]
+        #     team_direction = tracking['team_direction'].iloc[0]
+        #     xG = passes['possession_xg'].iloc[0]
+
+
+        #     end_x = passes['end_x'].iloc[0]
+        #     end_y = passes['end_y'].iloc[0]
+
+        #     #extracting the pass classification values
+        #     forward_pass = passes['forward pass'].iloc[0]
+        #     back_pass = passes['backward pass'].iloc[0]
+        #     lateral_pass = passes['lateral pass'].iloc[0]
+
+        #     if forward_pass:
+        #         pass_type = " forward pass"
+        #     elif back_pass:
+        #         pass_type = " back pass"
+        #     elif lateral_pass:
+        #         pass_type = " lateral pass"
+        #     else:
+        #         pass_type = "an unspecified pass"
+            
+        #     xG = passes['possession_xg'].iloc[0]
+            
+        #     pass_features = {'pass_length' : passes['pass_length'].iloc[0]  ,
+        #                     'start_angle_to_goal' : passes['start_angle_to_goal'].iloc[0],
+        #                     'start_distance_to_goal' :passes['start_distance_to_goal'].iloc[0] ,
+        #                     'opponents_between' : passes['opponents_between'].iloc[0], 
+        #                     'packing' : passes['packing'].iloc[0], 
+        #                     'pressure_level_passer' : passes['pressure level passer'].iloc[0],
+        #                     'opponents_nearby' : passes['opponents_nearby'].iloc[0],
+        #                     'possession_xg' : passes['possession_xg'].iloc[0],
+        #                     'teammates_beyond' : passes['teammates_beyond'].iloc[0],
+        #                     'opponents_beyond' : passes['opponents_beyond'].iloc[0],
+        #                     'start_distance_to_sideline' : passes['start_distance_to_sideline'].iloc[0],
+        #                     'end_distance_to_sideline' : passes['end_distance_to_sideline'].iloc[0],
+        #                     'speed_difference' : passes['speed_difference'].iloc[0],
+        #                     'pass_angle' : passes['pass_angle'].iloc[0],
+        #                     'teammates_nearby' : passes['teammates_nearby'].iloc[0],
+        #                     'end_distance_to_goal' : passes['end_distance_to_goal'].iloc[0],
+        #                     'end_angle_to_goal' : passes['end_angle_to_goal'].iloc[0],
+        #                     'pressure_on_passer' : passes['pressure_on_passer'].iloc[0]
+        #                     }
+            
+        #     origin_zone = sentences.classify_lateral_zone(y)
+        #     target_zone = sentences.classify_lateral_zone(end_y)
+
+        #     feature_descriptions = sentences.describe_pass_features_logistic(pass_features, self.competition)
+        #     pass_description = (
+        #         f"The pass is a {pass_type} originated from {sentences.describe_position_pass(x,y,team_direction)} \n and the passer is {player_name} from {team_name} team."
+        #         f"{sentences.describe_xT_pass_logistic(xT,xG)}"
+        #     )
+        #     pass_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
+
+        #     pass_description += '\n' + sentences.describe_pass_contributions_logistic(contributions, pass_features)
+
+        #     with st.expander("Synthesized Text"):
+        #         st.write(pass_description)
+            
+        #     return pass_description 
         def synthesize_text(self):
 
             pass_data = self.pass_data
-            #df_contributions = self.df_contributions
             
-            #for a specific pass id
             passes = pass_data.df_pass[pass_data.df_pass['id'] == self.pass_id] 
             contributions = pass_data.df_contributions[pass_data.df_contributions['id'] == self.pass_id]
             tracking = pass_data.df_tracking[pass_data.df_tracking['id'] == self.pass_id]
 
-
             if passes.empty:
-                raise ValueError(f"No shot found with ID {self.shot_id}")
+                raise ValueError(f"No pass found with ID {self.pass_id}")
             
             player_name = passes['passer_name'].iloc[0]
             team_name = passes['team_name'].iloc[0]
             xT = contributions['xT'].iloc[0]
-            x = passes['passer_x'].iloc[0]
-            y = passes['passer_y'].iloc[0]
-            team_direction = tracking['team_direction'].iloc[0]
             xG = passes['possession_xg'].iloc[0]
 
-            #extracting the pass classification values
+            # Start & end coordinates
+            start_x = passes['passer_x'].iloc[0]
+            start_y = passes['passer_y'].iloc[0]
+            end_x = passes['end_x'].iloc[0]
+            end_y = passes['end_y'].iloc[0]
+            #team_direction = tracking['team_direction'].iloc[0]
+
+            # Pass type
             forward_pass = passes['forward pass'].iloc[0]
             back_pass = passes['backward pass'].iloc[0]
             lateral_pass = passes['lateral pass'].iloc[0]
 
             if forward_pass:
-                pass_type = " forward pass"
+                pass_type = "forward pass"
             elif back_pass:
-                pass_type = " back pass"
+                pass_type = "back pass"
             elif lateral_pass:
-                pass_type = " lateral pass"
+                pass_type = "lateral pass"
             else:
-                pass_type = "an unspecified pass"
-            
-            xG = passes['possession_xg'].iloc[0]
-            
-            pass_features = {'pass_length' : passes['pass_length'].iloc[0]  ,
-                            'start_angle_to_goal' : passes['start_angle_to_goal'].iloc[0],
-                            'start_distance_to_goal' :passes['start_distance_to_goal'].iloc[0] ,
-                            'opponents_between' : passes['opponents_between'].iloc[0], 
-                            'packing' : passes['packing'].iloc[0], 
-                            'pressure_level_passer' : passes['pressure level passer'].iloc[0],
-                            'opponents_nearby' : passes['opponents_nearby'].iloc[0],
-                            'possession_xg' : passes['possession_xg'].iloc[0],
-                            'teammates_beyond' : passes['teammates_beyond'].iloc[0],
-                            'opponents_beyond' : passes['opponents_beyond'].iloc[0],
-                            'start_distance_to_sideline' : passes['start_distance_to_sideline'].iloc[0],
-                            'end_distance_to_sideline' : passes['end_distance_to_sideline'].iloc[0],
-                            'speed_difference' : passes['speed_difference'].iloc[0],
-                            'pass_angle' : passes['pass_angle'].iloc[0],
-                            'teammates_nearby' : passes['teammates_nearby'].iloc[0],
-                            'end_distance_to_goal' : passes['end_distance_to_goal'].iloc[0],
-                            'end_angle_to_goal' : passes['end_angle_to_goal'].iloc[0],
-                            'pressure_on_passer' : passes['pressure_on_passer'].iloc[0]
-                            }
+                pass_type = "pass"
+
+            # Core features
+            pass_features = {
+                'pass_length': passes['pass_length'].iloc[0],
+                'start_angle_to_goal': passes['start_angle_to_goal'].iloc[0],
+                'start_distance_to_goal': passes['start_distance_to_goal'].iloc[0],
+                'opponents_between': passes['opponents_between'].iloc[0],
+                'packing': passes['packing'].iloc[0],
+                'pressure_level_passer': passes['pressure level passer'].iloc[0],
+                'opponents_nearby': passes['opponents_nearby'].iloc[0],
+                'possession_xg': passes['possession_xg'].iloc[0],
+                'teammates_beyond': passes['teammates_beyond'].iloc[0],
+                'opponents_beyond': passes['opponents_beyond'].iloc[0],
+                'start_distance_to_sideline': passes['start_distance_to_sideline'].iloc[0],
+                'end_distance_to_sideline': passes['end_distance_to_sideline'].iloc[0],
+                'speed_difference': passes['speed_difference'].iloc[0],
+                'pass_angle': passes['pass_angle'].iloc[0],
+                'teammates_nearby': passes['teammates_nearby'].iloc[0],
+                'end_distance_to_goal': passes['end_distance_to_goal'].iloc[0],
+                'end_angle_to_goal': passes['end_angle_to_goal'].iloc[0],
+                'pressure_on_passer': passes['pressure_on_passer'].iloc[0],
+            }
+
+            # NEW: origin & destination zones
+            origin_zone = sentences.classify_lateral_zone(start_y)
+            target_zone = sentences.classify_lateral_zone(end_y)
 
             feature_descriptions = sentences.describe_pass_features_logistic(pass_features, self.competition)
-            pass_description = (
-                f"The pass is a {pass_type} originated from {sentences.describe_position_pass(x,y,team_direction)} \n and the passer is {player_name} from {team_name} team."
-                f"{sentences.describe_xT_pass_logistic(xT,xG)}"
-            )
-            pass_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
 
-            pass_description += '\n' + sentences.describe_pass_contributions_logistic(contributions, pass_features)
+            # Main summary sentence(s)
+            pass_description = (
+                f"{player_name} of {team_name} played a {pass_type} from {origin_zone} "
+                f"into {target_zone}. "
+                f"{sentences.describe_xT_pass_logistic(xT, xG)}"
+            )
+
+            # Add feature-based narrative
+            pass_description += " " + " ".join(feature_descriptions) + "\n"
+            pass_description += "\n" + sentences.describe_pass_contributions_logistic(contributions, pass_features)
 
             with st.expander("Synthesized Text"):
                 st.write(pass_description)
             
-            return pass_description 
+            return pass_description
         
-
         def get_prompt_messages(self):
             prompt = (
-                "You are a football commentator. You should write in an exciting and engaging way about the features contributing for pass to be a shot and is it a safe or dangerous pass."
-                f"You should giva a four sentence summary of the pass taken by the player. "
-                "The first sentence should say whether it was a good chance or not, state the expected threat value and also state the probability of expected goal. "
-                "The second and third sentences should describe the most important factors that contributed to the pass to be safe or dangerous. "
-                "If it was a good chance these two sentences chould explain what contributing factors made the pass dangerous. "
-                "If it wasn't particularly good chance then these two sentences chould explain why it was a safe pass. "
-                "Depedning on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when initiating the pass."
-                )
-            return [{"role": "user", "content": prompt}]   
+                "You are a professional football analyst and TV commentator. "
+                "Write in an exciting and engaging, but precise and professional tone. "
+                "You are given a description of a single pass and its context. "
+                "Your task is to write a four-sentence summary of this pass.\n\n"
+                "Guidelines:\n"
+                "- The first sentence should state whether it was a good chance or not, mention the expected threat (xT) value, "
+                "and, if relevant, the probability that the possession led to a shot on goal.\n"
+                "- The second and third sentences should describe the most important factors that made the pass dangerous or safe "
+                "in clear football language (for example, pressure, spacing, passing lane, distance to goal, pass direction).\n"
+                "- The final sentence should either praise the player or give a concise piece of advice about what to consider "
+                "when attempting a similar pass.\n"
+                "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
+                "Use natural football terms instead.\n"
+                "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
+            )
+            return [{"role": "user", "content": prompt}]
+ 
+
+        
+
+        # def get_prompt_messages(self):
+        #     prompt = (
+        #         "You are a football commentator. You should write in an exciting and engaging way about the features contributing for pass to be a shot and is it a safe or dangerous pass."
+        #         f"You should giva a four sentence summary of the pass taken by the player. "
+        #         "The first sentence should say whether it was a good chance or not, state the expected threat value and also state the probability of expected goal. "
+        #         "The second and third sentences should describe the most important factors that contributed to the pass to be safe or dangerous. "
+        #         "If it was a good chance these two sentences chould explain what contributing factors made the pass dangerous. "
+        #         "If it wasn't particularly good chance then these two sentences chould explain why it was a safe pass. "
+        #         "Depedning on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when initiating the pass."
+        #         )
+        #     return [{"role": "user", "content": prompt}]   
 
 
  #class description of features for xNN

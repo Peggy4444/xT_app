@@ -822,7 +822,99 @@ def read_pass_feature_thresholds_logistic(competition):
     thresholds_pass = pd.read_csv(file_path, index_col=0)
     return thresholds_pass
 
+
 def describe_pass_features_logistic(features, competition):
+    descriptions = []
+
+    thresholds = read_pass_feature_thresholds(competition)
+
+    # --- Pass length ---
+    if features['pass_length'] <= thresholds['pass_length'].iloc[4]:
+        descriptions.append("It was a short pass")
+    elif features['pass_length'] <= thresholds['pass_length'].iloc[5]:
+        descriptions.append("It was a medium-length pass")
+    else:
+        descriptions.append("It was a long pass")
+
+    # --- Start angle & distance to goal ---
+    dist_to_goal = round(features['start_distance_to_goal'])  # no unnecessary decimals
+
+    if features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[4]:
+        descriptions.append(
+            f" with a narrow angle, covering around {dist_to_goal} metres and moving the ball toward the goal area."
+        )
+    elif features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[5]:
+        descriptions.append(
+            f" with a moderate angle, covering around {dist_to_goal} metres toward the goal area."
+        )
+    else:
+        descriptions.append(
+            f" with a wide angle, covering around {dist_to_goal} metres and moving the ball toward the goal area."
+        )
+
+    # --- Teammates / opponents beyond the passer ---
+    descriptions.append(
+        f" There were {int(features['teammates_beyond'])} teammates positioned ahead of the passer at the moment of the pass."
+    )
+    descriptions.append(
+        f" There were {int(features['opponents_beyond'])} opponents positioned ahead of the passer at the moment of the pass."
+    )
+
+    # --- Opponents in the passing lane ---
+    if features['opponents_between'] <= thresholds['opponents_between'].iloc[3]:
+        descriptions.append(" The passing lane was completely open.")
+    elif features['opponents_between'] <= thresholds['opponents_between'].iloc[4]:
+        descriptions.append(" The passing lane was mostly open, with only a few opponents in the way.")
+    else:
+        descriptions.append(" The passing lane was crowded with opponents.")
+
+    # --- Packing ---
+    packing = int(features['packing'])
+    if packing <= thresholds['packing'].iloc[3]:
+        descriptions.append(" No opponents were bypassed within 5 metres of the ball.")
+    elif packing <= thresholds['packing'].iloc[4]:
+        descriptions.append(" One opponent was bypassed within 5 metres of the ball.")
+    elif packing <= thresholds['packing'].iloc[5]:
+        descriptions.append(" Two opponents were bypassed within 5 metres of the ball.")
+    elif packing <= thresholds['packing'].iloc[6]:
+        descriptions.append(" Three opponents were bypassed within 5 metres of the ball.")
+    else:
+        descriptions.append(f" In total, {packing} opponents were bypassed within 5 metres of the ball.")
+
+    # --- Pressure level on passer ---
+    pressure = features['pressure_level_passer']
+    opponents_nearby = int(features['opponents_nearby'])
+
+    if pressure == "Low Pressure":
+        if opponents_nearby == 0:
+            descriptions.append(
+                " There were no nearby opponents within 6 metres of the passer, meaning the pressure was low at the moment of the pass."
+            )
+        elif opponents_nearby == 1:
+            descriptions.append(
+                " There was one nearby opponent within 6 metres of the passer, but overall the pressure was still low."
+            )
+        else:
+            descriptions.append(
+                f" There were {opponents_nearby} nearby opponents within 6 metres of the passer, but the situation was still classified as low pressure."
+            )
+    elif pressure == "Middle Pressure":
+        descriptions.append(
+            f" There were {opponents_nearby} nearby opponents within 6 metres of the passer, creating moderate pressure."
+        )
+    elif pressure == "High Pressure":
+        descriptions.append(
+            f" There were {opponents_nearby} nearby opponents within 6 metres of the passer, creating high pressure on the ball carrier."
+        )
+    else:
+        descriptions.append(" The pressure level on the passer was not clearly classified in this situation.")
+
+    return descriptions
+
+
+
+
+def describe_pass_features_logistic1(features, competition):
     descriptions = []
 
     # Step 1: Load thresholds
@@ -1205,7 +1297,7 @@ def describe_pass_single_feature(feature_name, feature_value):
 
 
 #logistic model 
-feature_name_mapping_logistic = { "start_distance_to_goal_contribution" : "start distance to goal",
+feature_name_mapping_logistic1 = { "start_distance_to_goal_contribution" : "start distance to goal",
     "end_distance_to_goal_contribution": "end distance to goal",
     "pass_length_contribution": "pass length",
     "pass_angle_contribution": "pass angle",
@@ -1221,6 +1313,27 @@ feature_name_mapping_logistic = { "start_distance_to_goal_contribution" : "start
     "opponents_nearby_contribution": "opponents nearby",
     "teammates_nearby_contribution": "teammates nearby"
 }
+
+
+feature_name_mapping_logistic = {
+    "end_distance_to_sideline": "the distance of the pass to the sideline after the pass was made",
+    "start_distance_to_sideline": "the distance of the passer to the sideline at the start of the pass",
+    "start_distance_to_goal": "the distance from the passer to the opponent's goal at the start of the pass",
+    "end_distance_to_goal": "the distance from the receiver to the opponent's goal when the pass arrived",
+    "teammates_beyond": "the number of teammates positioned ahead of the passer",
+    "opponents_beyond": "the number of opponents positioned ahead of the passer",
+    "opponents_nearby": "the number of opponents close to the passer",
+    "opponents_between": "the number of opponents in the passing lane",
+    "pass_length": "the length of the pass",
+    "pass_angle": "the direction of the pass relative to the goal",
+    "start_angle_to_goal": "the angle from the passer to the goal",
+    "end_angle_to_goal": "the angle from the receiver to the goal",
+    "packing": "the number of opponents bypassed by the pass",
+    "pressure_on_passer": "the pressure applied on the passer",
+    # add any other features you use here...
+}
+
+
 
 ### old contributions for logistic
 def describe_pass_contributions_logistic_old(contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic):
@@ -1275,8 +1388,60 @@ def describe_pass_contributions_logistic_old(contributions, pass_features, featu
 
     return text
 
+def describe_pass_contributions_logistic(
+    contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic
+):
+    text = "Below is an analysis of the most influential features behind this pass’s xT value:\n"
+
+    # Take first row and drop identifiers
+    row = contributions.iloc[0].drop(['match_id', 'id', 'xT'])
+    sorted_contributions = row.abs().sort_values(ascending=False)
+
+    for idx, (feature_name, abs_contrib) in enumerate(sorted_contributions.items()):
+        raw_contrib = row[feature_name]
+
+        # Filter by threshold (75th percentile, as you defined)
+        if abs(raw_contrib) < 0.08735242468992192:
+            continue
+
+        # Strip "_contribution" and map to readable name
+        base_feature = feature_name.replace('_contribution', '')
+        readable_name = feature_name_mapping.get(base_feature)
+
+        # If we don't have a good human-readable name, skip it rather than show a code name
+        if readable_name is None or base_feature not in pass_features:
+            continue
+
+        feature_value = pass_features[base_feature]
+        feature_desc = describe_pass_single_feature(base_feature, feature_value)
+
+        # Direction of influence
+        if raw_contrib > 0:
+            direction = "boosted the threat level of the pass."
+        elif raw_contrib < 0:
+            direction = "reduced the danger of the pass."
+        else:
+            direction = "had no notable influence on the outcome."
+
+        # First vs subsequent sentences (no bullet marker)
+        if idx == 0:
+            text += (
+                f"\n{readable_name.capitalize()} had the strongest impact: "
+                f"{feature_desc}. It {direction}"
+            )
+        else:
+            text += (
+                f"\n{readable_name.capitalize()} also stood out: "
+                f"{feature_desc}. It {direction}"
+            )
+
+    return text
+
+
+
+
 #new one for logistic
-def describe_pass_contributions_logistic(contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic):
+def describe_pass_contributions_logistic1(contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic):
     text = "Below is an analysis of the most influential features behind this pass’s xT value:\n"
 
     # Extract contributions
@@ -1311,6 +1476,28 @@ def describe_pass_contributions_logistic(contributions, pass_features, feature_n
             text += f"\n- **{feature_display}** also stood out: {feature_desc}. It {direction}."
 
     return text
+
+
+def classify_lateral_zone(y, pitch_width=68):
+    """
+    Classify y-position into central zone, left/right half-space, left/right wing.
+    Assumes y in [0, pitch_width] with 0 = left touchline from attacking team's view.
+    Adjust pitch_width and thresholds to your coordinate system if needed.
+    """
+    # Normalise to 0–1
+    y_norm = y / pitch_width
+
+    if y_norm < 0.17:
+        return "the wing"
+    elif y_norm < 0.33:
+        return "the ft half-space"
+    elif y_norm < 0.67:
+        return "the central zone"
+    elif y_norm < 0.83:
+        return "the half-space"
+    else:
+        return "the wing"
+
 
 
 #xgboost,xNN,CNN,trees models
