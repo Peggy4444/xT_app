@@ -113,39 +113,7 @@ def describe_xT_pass_1(xT,xG):
     return description
 
 
-### describe function for logistic old one
-def describe_xT_pass_logistic_old(xT,xG):
-    if xG != 0:
-        if xT <= 0.05882884: #25 percentile xT
-            if xG < 0.066100:
-                description = f" It had low xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with  xG value {xG:.3f}. There is less chances for it to be a safe pass creating less goal scoring opportunities."
-            else:
-                description = f" It had low xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with  xG value {xG:.3f}. There is less chances for it to be a dangerous pass creating a good goal scoring opportunities."
-        elif xT > 0.05882884 and xT <= 0.079879159: #50 percentile
-            if xG < 0.066100:
-                description = f" It had moderate xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value is {xG:.3f}. There is moderate chances of being a safe pass creating less goal scoring opportunities."
-            else:
-                description = f" It had moderate xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value is {xG:.3f}. There is moderate chances of being a dangerous pass creating good goal scoring opportunities."
-        elif xT > 0.079879159 and xT <=  0.130563166: #75 percentile
-            if xG < 0.066100:
-                description = f" It had high xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value {xG:.3f}. There is high chances of being a safe pass creating less goal scoring opportunities."
-            else:
-                description = f" It had high xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value {xG:.3f}. There is high chances of being a dangerous pass creating good goal scoring opportunities."  
-        else:
-            if xG < 0.066100:
-                description = f" It had excellent xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% creating a excellent goal scoring opportunities for safe pass." 
-            else:
-                description = f" It had excellent xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% creating a excellent goal scoring opportunities for dangerous pass."    
-    else:
-        if xT <= 0.05882884: #25 percentile
-            description = f" The xT value is {xT} and it did not lead to a shot and opportunities to score goal is less."
-        elif xT <= 0.079879159: #50 percentile
-            description = f" The xT value is {xT} and it did not lead to a shot, the opportunities to score goal is moderate."
-        elif xT <= 0.130563166: #75 percentile
-            description = f" The xT value is {xT} and it did not lead to a shot, the opportunities to score goal is high."
-        else:
-            description = f" The xT value is {xT} and it did not lead to a shot, the opportunities to score goal is very high."
-    return description
+
 
 
 ### describe for logistic model current one 
@@ -174,12 +142,12 @@ def describe_xT_pass_logistic(xT, xG):
             goal_quality = "a dangerous shot on goal"
 
         description = (
-            f"With an xT of {xT:.3f}, this pass carried a **{xt_label} threat**, suggesting a {xt_prob}% chance of leading to a shot "
+            f"With an xT of {xT:.2f}, this pass carried a **{xt_label} threat**, suggesting a {xt_prob}% chance of leading to a shot "
             f"valued at more than 0.06 xG. It ultimately resulted in {goal_quality}, reflecting its attacking intent."
         )
     else:
         description = (
-            f"Despite an xT of {xT:.3f}, which indicates a **{xt_label} probability** of ending in a quality shot, "
+            f"Despite an xT of {xT:.2f}, which indicates a **{xt_label} probability** of ending in a quality shot, "
             f"this pass didn’t lead to an attempt on goal."
         )
 
@@ -239,40 +207,7 @@ def describe_models_xNN(pressure, speed, position, event):
 
 
 
-### describe for xNN 
-def describe_xT_pass_xNN_old(xT,xG):
-    if xG != 0:
-        if xT <= 0.05178240314126015: #25 percentile xT
-            if xG < 0.066100:
-                description = f" It had low xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with  xG value {xG:.3f}. There is less chances for it to be a safe pass creating less goal scoring opportunities."
-            else:
-                description = f" It had low xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with  xG value {xG:.3f}. There is less chances for it to be a dangerous pass creating a good goal scoring opportunities."
-        elif xT > 0.05178240314126015 and xT <= 0.06115284748375416: #50 percentile
-            if xG < 0.066100:
-                description = f" It had moderate xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value is {xG:.3f}. There is moderate chances of being a safe pass creating less goal scoring opportunities."
-            else:
-                description = f" It had moderate xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value is {xG:.3f}. There is moderate chances of being a dangerous pass creating good goal scoring opportunities."
-        elif xT > 0.06115284748375416 and xT <=  0.06652335822582245: #75 percentile
-            if xG < 0.066100:
-                description = f" It had high xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value {xG:.3f}. There is high chances of being a safe pass creating less goal scoring opportunities."
-            else:
-                description = f" It had high xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value {xG:.3f}. There is high chances of being a dangerous pass creating good goal scoring opportunities."  
-        else:
-            if xG < 0.066100:
-                description = f" It had excellent xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% creating a excellent goal scoring opportunities for safe pass." 
-            else:
-                description = f" It had excellent xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% creating a excellent goal scoring opportunities for dangerous pass."   
-    else:
-        if xT <= 0.05178240314126015: #25 percentile
-            description = f" The xT value is {xT} and it did not lead to a shot and opportunities to score goal is less."
-        elif xT <= 0.06115284748375416: #50 percentile
-            description = f" The xT value is {xT} and it did not lead to a shot, the opportunities to score goal is moderate."
-        elif xT <= 0.06652335822582245: #75 percentile
-            description = f" The xT value is {xT} and it did not lead to a shot, the opportunities to score goal is high."
-        else:
-            description = f" The xT value is {xT} and it did not lead to a shot, the opportunities to score goal is very high."
-    
-    return description
+     
 
 def describe_xT_pass_xNN(xT, xG):
     xt_percentile_25 = 0.05178240314126015
@@ -299,12 +234,12 @@ def describe_xT_pass_xNN(xT, xG):
             goal_quality = "a dangerous shot on goal"
 
         description = (
-            f"With an xT of {xT:.3f}, this pass carried a **{xt_label} threat**, suggesting a {xt_prob}% chance of leading to a shot "
+            f"With an xT of {xT:.2f}, this pass carried a **{xt_label} threat**, suggesting a {xt_prob}% chance of leading to a shot "
             f"valued at more than 0.06 xG. It ultimately resulted in {goal_quality}, reflecting its attacking intent."
         )
     else:
         description = (
-            f"Despite an xT of {xT:.3f}, which indicates a **{xt_label} probability** of ending in a quality shot, "
+            f"Despite an xT of {xT:.2f}, which indicates a **{xt_label} probability** of ending in a quality shot, "
             f"this pass didn’t lead to an attempt on goal."
         )
 
@@ -338,12 +273,12 @@ def describe_xT_pass_xgboost(xT, xG):
             goal_quality = "a dangerous shot on goal"
 
         description = (
-            f"With an xT of {xT:.3f}, this pass had a **{xt_label} threat level**, implying about a {xt_prob}% chance of leading to a shot. "
+            f"With an xT of {xT:.2f}, this pass had a **{xt_label} threat level**, implying about a {xt_prob}% chance of leading to a shot. "
             f"It culminated in {goal_quality}, reflecting its attacking potential."
         )
     else:
         description = (
-            f"This pass had an xT of {xT:.3f}, indicating a **{xt_label} chance** of creating a shot. "
+            f"This pass had an xT of {xT:.2f}, indicating a **{xt_label} chance** of creating a shot. "
             f"However, no attempt on goal followed."
         )
 
@@ -1335,59 +1270,6 @@ feature_name_mapping_logistic = {
 
 
 
-### old contributions for logistic
-def describe_pass_contributions_logistic_old(contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic):
-    text = "The contributions of the features to the xT, sorted by their magnitude from largest to smallest, are as follows:\n"
-    
-    # Extract the contributions from the pass_contributions DataFrame
-    contributions = contributions.iloc[0].drop(['match_id', 'id', 'xT'])  # Drop irrelevant columns
-    
-    # Sort the contributions by their absolute value (magnitude) in descending order
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-    
-    # Get the top 4 contributions
-    top_contributions = sorted_contributions
-    
-    # Loop through the top contributions to generate descriptions
-    for idx, (feature, contribution) in enumerate(top_contributions.items()):
-
-        # Get the original sign of the contribution
-        original_contribution = contributions[feature]
-
-        if original_contribution >= 0.08735242468992192 or original_contribution <= -0.08735242468992192:
-        
-            # Remove "_contribution" suffix to match feature names in pass_features
-            feature_name = feature.replace('_contribution', '')
-            
-            # Use feature_name_mapping to get the display name for the feature (if available)
-            feature_display_name = feature_name_mapping.get(feature, feature)
-            
-            # Get the feature value from pass_features
-            feature_value = pass_features[feature_name]
-            
-            # Get the feature description
-            feature_value_description = describe_pass_single_feature(feature_name, feature_value)
-            
-            # Add the feature's contribution to the xT description
-            if original_contribution > 0:
-                impact = 'maximum positive contribution'
-                impact_text = "increased the xT."
-            elif original_contribution < 0:
-                impact = 'maximum negative contribution'
-                impact_text = "reduced the xT."
-            else:
-                impact = 'no contribution'
-                impact_text = "had no impact on the xT."
-
-            # Use appropriate phrasing for the first feature and subsequent features
-            if idx == 0:
-                text += f"\nThe most impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-            else:
-                text += f"\nAnother impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-        
-
-    return text
-
 def describe_pass_contributions_logistic(
     contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic
 ):
@@ -1440,44 +1322,6 @@ def describe_pass_contributions_logistic(
 
 
 
-#new one for logistic
-def describe_pass_contributions_logistic1(contributions, pass_features, feature_name_mapping=feature_name_mapping_logistic):
-    text = "Below is an analysis of the most influential features behind this pass’s xT value:\n"
-
-    # Extract contributions
-    contributions = contributions.iloc[0].drop(['match_id','id', 'xT'])
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-
-    for idx, (feature, abs_contrib) in enumerate(sorted_contributions.items()):
-        raw_contrib = contributions[feature]
-
-        # Filter by threshold (75th percentile)
-        if abs(raw_contrib) < 0.08735242468992192:
-            continue
-
-        # Get readable feature name + value
-        feature = feature.replace('_contribution', '')
-        feature_display = feature_name_mapping.get(feature, feature.replace("_contribution", " "))
-        feature_value = pass_features[feature]
-        feature_desc = describe_pass_single_feature(feature, feature_value)
-
-        # Determine polarity and phrasing
-        if raw_contrib > 0:
-            direction = "boosted the threat level"
-        elif raw_contrib < 0:
-            direction = "diminished the pass's danger"
-        else:
-            direction = "had no notable influence"
-
-        # Add to text
-        if idx == 0:
-            text += f"\n- **{feature_display}** had the strongest impact: {feature_desc}. It significantly {direction}."
-        else:
-            text += f"\n- **{feature_display}** also stood out: {feature_desc}. It {direction}."
-
-    return text
-
-
 def classify_lateral_zone(y, pitch_width=68):
     """
     Classify y-position into central zone, left/right half-space, left/right wing.
@@ -1522,55 +1366,9 @@ feature_name_mapping_pass = { "start_distance_to_goal" : "start distance to goal
     "teammates_nearby": "teammates nearby"
 }
 
-# Contribution function for xgboost
-def describe_pass_contributions_xgboost_old(feature_contrib_df, pass_features, feature_name_mapping=feature_name_mapping_pass):
-    text = "The contributions of the features to the xT, sorted by their magnitude from largest to smallest, are as follows:\n"
     
-    # Extract the contributions from the pass_contributions DataFrame
-    contributions = feature_contrib_df.iloc[0].drop(['match_id', 'id', 'xT_predicted'])  # Drop irrelevant columns
-    
-    # Sort the contributions by their absolute value (magnitude) in descending order
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-    
-    # Get the top 4 contributions
-    top_contributions = sorted_contributions
-    
-    # Loop through the top contributions to generate descriptions
-    for idx, (feature,contribution) in enumerate(top_contributions.items()):
-        # Get the original sign of the contribution
-        original_contribution = contributions[feature]
 
-        if original_contribution >= 0.026505677450064418 or original_contribution <= -0.026505677450064418:
-            
-            # Use feature_name_mapping to get the display name for the feature (if available)
-            feature_display_name = feature_name_mapping.get(feature, feature)
-            
-            # Get the feature value from shot_features
-            feature_value = pass_features[feature]
-            
-            # Get the feature description
-            feature_value_description = describe_pass_single_feature(feature, feature_value)
-            
-            # Add the feature's contribution to the xT description
-            if original_contribution > 0:
-                impact = 'maximum positive contribution'
-                impact_text = "increased the xT."
-            elif original_contribution < 0:
-                impact = 'maximum negative contribution'
-                impact_text = "reduced the xT."
-            else:
-                impact = 'no contribution'
-                impact_text = "had no impact on the xT."
-                print(original_contribution)
 
-            # Use appropriate phrasing for the first feature and subsequent features
-            if idx == 0:
-                text += f"\nThe most impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-            else:
-                text += f"\nAnother impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-        
-
-    return text
 
 def describe_pass_contributions_xgboost(feature_contrib_df, pass_features, feature_name_mapping=feature_name_mapping_pass):
     text = "Below is an analysis of the most influential features behind this pass’s predicted xT value:\n"
@@ -1580,118 +1378,116 @@ def describe_pass_contributions_xgboost(feature_contrib_df, pass_features, featu
     sorted_contributions = contributions.abs().sort_values(ascending=False)
 
     # Iterate through sorted features
-    for idx, (feature, abs_contrib) in enumerate(sorted_contributions.items()):
-        raw_contrib = contributions[feature]
+    for idx, (feature_name, abs_contrib) in enumerate(sorted_contributions.items()):
+        raw_contrib = contributions[feature_name]
 
         # Only include features with meaningful contribution (above threshold)
         if abs(raw_contrib) < 0.026505677450064418:
             continue
+                # Strip "_contribution" and map to readable name
+        base_feature = feature_name.replace('_contribution', '')
+        readable_name = feature_name_mapping.get(base_feature)
 
-        # Get display name and value description
-        feature_display = feature_name_mapping.get(feature, feature.replace("_", " "))
-        feature_value = pass_features[feature]
-        feature_desc = describe_pass_single_feature(feature, feature_value)
-
-        # Determine direction of impact
-        if raw_contrib > 0:
-            direction = "boosted the threat value"
-        elif raw_contrib < 0:
-            direction = "lowered the predicted xT"
-        else:
-            direction = "had no notable effect"
-
-        # Write output text
-        if idx == 0:
-            text += f"\n- **{feature_display}** had the strongest impact: {feature_desc}. It significantly {direction}."
-        else:
-            text += f"\n- **{feature_display}** also influenced the outcome: {feature_desc}. It {direction}."
-
-    return text
-
-
-#contribution feature of xNN model
-def describe_pass_contributions_xNN_old(contributions_xNN, pass_features, feature_name_mapping=feature_name_mapping_pass):
-    text = "The contributions of the features to the xT, sorted by their magnitude from largest to smallest, are as follows:\n"
-    
-    # Extract the contributions from the pass_contributions
-    contributions = contributions_xNN.iloc[0].drop(['id', 'xT_predicted'])  # Drop irrelevant columns
-    
-    # Sort the contributions by their absolute value (magnitude) in descending order
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-    
-    # Get the top 4 contributions
-    top_contributions = sorted_contributions
-    
-    # Loop through the top contributions to generate descriptions
-    for idx, (feature, contribution) in enumerate(top_contributions.items()):
-
-        # Get the original sign of the contribution
-        original_contribution = contributions[feature]
-
-        if original_contribution >= 0.00788100733068301 or original_contribution <= -0.00788100733068301:
-            
-            # Use feature_name_mapping to get the display name for the feature (if available)
-            feature_display_name = feature_name_mapping.get(feature, feature)
-            
-            # Get the feature value from shot_features
-            feature_value = pass_features[feature]
-            
-            # Get the feature description
-            feature_value_description = describe_pass_single_feature(feature, feature_value)
-            
-            # Add the feature's contribution to the xT description
-            if original_contribution > 0:
-                impact = 'maximum positive contribution'
-                impact_text = "increased the xT."
-            elif original_contribution < 0:
-                impact = 'maximum negative contribution'
-                impact_text = "reduced the xT."
-            else:
-                impact = 'no contribution'
-                impact_text = "had no impact on the xT."
-
-            # Use appropriate phrasing for the first feature and subsequent features
-            if idx == 0:
-                text += f"\nThe most impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-            else:
-                text += f"\nAnother impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-        
-
-    return text
-
-
-def describe_pass_contributions_xNN(contributions_xNN, pass_features, feature_name_mapping=feature_name_mapping_pass):
-    text = "Below is an analysis of the most influential features behind this pass’s xT value:\n"
-
-    # Extract contributions
-    contributions = contributions_xNN.iloc[0].drop(['id', 'xT_predicted'])
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-
-    for idx, (feature, abs_contrib) in enumerate(sorted_contributions.items()):
-        raw_contrib = contributions[feature]
-
-        # Filter by threshold (75th percentile)
-        if abs(raw_contrib) < 0.00788100733068301:
+        # If we don't have a good human-readable name, skip it rather than show a code name
+        if readable_name is None or base_feature not in pass_features:
             continue
 
-        # Get readable feature name + value
-        feature_display = feature_name_mapping.get(feature, feature.replace("_", " "))
-        feature_value = pass_features[feature]
-        feature_desc = describe_pass_single_feature(feature, feature_value)
+        feature_value = pass_features[base_feature]
+        feature_desc = describe_pass_single_feature(base_feature, feature_value)
 
-        # Determine polarity and phrasing
+        # Direction of influence
         if raw_contrib > 0:
-            direction = "boosted the threat level"
+            direction = "boosted the threat level of the pass."
         elif raw_contrib < 0:
-            direction = "diminished the pass's danger"
+            direction = "reduced the danger of the pass."
         else:
-            direction = "had no notable influence"
+            direction = "had no notable influence on the outcome."
 
-        # Add to text
+        # First vs subsequent sentences (no bullet marker)
         if idx == 0:
-            text += f"\n- **{feature_display}** had the strongest impact: {feature_desc}. It significantly {direction}."
+            text += (
+                f"\n{readable_name.capitalize()} had the strongest impact: "
+                f"{feature_desc}. It {direction}"
+            )
         else:
-            text += f"\n- **{feature_display}** also stood out: {feature_desc}. It {direction}."
+            text += (
+                f"\n{readable_name.capitalize()} also stood out: "
+                f"{feature_desc}. It {direction}"
+            )
+    return text
+
+    #     # Get display name and value description
+    #     feature_display = feature_name_mapping.get(feature, feature.replace("_", " "))
+    #     feature_value = pass_features[feature]
+    #     feature_desc = describe_pass_single_feature(feature, feature_value)
+
+    #     # Determine direction of impact
+    #     if raw_contrib > 0:
+    #         direction = "boosted the threat value"
+    #     elif raw_contrib < 0:
+    #         direction = "lowered the predicted xT"
+    #     else:
+    #         direction = "had no notable effect"
+
+    #     # Write output text
+    #     if idx == 0:
+    #         text += f"\n- **{feature_display}** had the strongest impact: {feature_desc}. It significantly {direction}."
+    #     else:
+    #         text += f"\n- **{feature_display}** also influenced the outcome: {feature_desc}. It {direction}."
+
+    # return text
+
+
+
+
+
+def describe_pass_contributions_xNN(
+    contributions_xNN, pass_features, feature_name_mapping=feature_name_mapping_pass):
+    text = "Below is an analysis of the most influential features behind this pass’s xT value:\n"
+    row = contributions_xNN.iloc[0].drop(['id', 'xT_predicted'])
+
+    # Take first row and drop identifiers
+    row = contributions_xNN.iloc[0].drop(['id', 'xT_predicted'])
+    #row = contributions_xNN.iloc[0].drop(['match_id', 'id', 'xT'])
+    sorted_contributions = row.abs().sort_values(ascending=False)
+
+    for idx, (feature_name, abs_contrib) in enumerate(sorted_contributions.items()):
+        raw_contrib = row[feature_name]
+
+        # Filter by threshold (75th percentile, as you defined)
+        if abs(raw_contrib) < 0.08735242468992192:
+            continue
+
+        # Strip "_contribution" and map to readable name
+        base_feature = feature_name.replace('_contribution', '')
+        readable_name = feature_name_mapping.get(base_feature)
+
+        # If we don't have a good human-readable name, skip it rather than show a code name
+        if readable_name is None or base_feature not in pass_features:
+            continue
+
+        feature_value = pass_features[base_feature]
+        feature_desc = describe_pass_single_feature(base_feature, feature_value)
+
+        # Direction of influence
+        if raw_contrib > 0:
+            direction = "boosted the threat level of the pass."
+        elif raw_contrib < 0:
+            direction = "reduced the danger of the pass."
+        else:
+            direction = "had no notable influence on the outcome."
+
+        # First vs subsequent sentences (no bullet marker)
+        if idx == 0:
+            text += (
+                f"\n{readable_name.capitalize()} had the strongest impact: "
+                f"{feature_desc}. It {direction}"
+            )
+        else:
+            text += (
+                f"\n{readable_name.capitalize()} also stood out: "
+                f"{feature_desc}. It {direction}"
+            )
 
     return text
 
@@ -1761,169 +1557,5 @@ def describe_pass_contributions_bayesian(contributions_bayes_df, pass_features, 
     return text
 
 
-def describe_pass_contributions_TabNet(contributions_tabnet, pass_features, feature_name_mapping=feature_name_mapping_pass):
-    #text = "The model’s prediction for this pass was shaped by the following features, listed in order of their influence on the model’s confidence:\n"
-    text = "The most influencial features which makes pass threatful are as follows :"
-
-    # Extract the contributions from the pass_contributions
-    contributions = contributions_tabnet.iloc[0].drop(['match_id', 'id', 'Predicted_Probability'])  # Drop irrelevant columns
-    
-    # Sort the contributions by their absolute value (magnitude) in descending order
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-    
-    # Loop through contributions and describe
-    for idx, (feature, contribution) in enumerate(sorted_contributions.items()):
-        original_contribution = contributions[feature]
-
-        # Skip features with very small influence
-        if abs(original_contribution) < 0.01:
-            continue
-        
-        feature_display_name = feature_name_mapping.get(feature, feature)
-        feature_value = pass_features[feature]
-        feature_value_description = describe_pass_single_feature(feature, feature_value)
-
-        # IG-specific language
-        if original_contribution > 0:
-            #direction = "increased the model's confidence in this pass being dangerous"
-            direction = "increased the threat of the pass"
-            impact = "strong positive influence"
-        elif original_contribution < 0:
-            #direction = "led the model to be less confident about the danger of this pass"
-            direction = "decreased the threat of the pass"
-            impact = "strong negative influence"
-        else:
-            direction = "did not noticeably affect the pass"
-            impact = "neutral influence"
-
-        if idx == 0:
-            text += f"\nThe most influential feature is **{feature_display_name}**, which had a {impact} because {feature_value_description}. It {direction}."
-        else:
-            text += f"\nAnother notable feature is **{feature_display_name}**, which had a {impact} because {feature_value_description}. It {direction}."
-
-    return text
 
 
-
-
-
-# #contribution feature of TabNet model
-def describe_pass_contributions_TabNet_old(contributions_tabnet, pass_features, feature_name_mapping=feature_name_mapping_pass):
-    text = "The contributions of the features to the xT, sorted by their magnitude from largest to smallest, are as follows:\n"
-    
-    # Extract the contributions from the pass_contributions
-    contributions = contributions_tabnet.iloc[0].drop(['match_id', 'id', 'Predicted_Probability'])  # Drop irrelevant columns
-    
-    # Sort the contributions by their absolute value (magnitude) in descending order
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-    
-    # Get the top 4 contributions
-    top_contributions = sorted_contributions
-    
-    # Loop through the top contributions to generate descriptions
-    for idx, (feature, contribution) in enumerate(top_contributions.items()):
-
-        # Get the original sign of the contribution
-        original_contribution = contributions[feature]
-
-        if original_contribution >= 0.01 or original_contribution <= -0.01:
-            
-            # Use feature_name_mapping to get the display name for the feature (if available)
-            feature_display_name = feature_name_mapping.get(feature, feature)
-            
-            # Get the feature value from shot_features
-            feature_value = pass_features[feature]
-            
-            # Get the feature description
-            feature_value_description = describe_pass_single_feature(feature, feature_value)
-            
-            # Add the feature's contribution to the xT description
-            if original_contribution > 0:
-                impact = 'maximum positive contribution'
-                impact_text = "increased the xT."
-            elif original_contribution < 0:
-                impact = 'maximum negative contribution'
-                impact_text = "reduced the xT."
-            else:
-                impact = 'no contribution'
-                impact_text = "had no impact on the xT."
-
-            # Use appropriate phrasing for the first feature and subsequent features
-            if idx == 0:
-                text += f"\nThe most impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-            else:
-                text += f"\nAnother impactful feature is {feature_display_name}, which had the {impact} because {feature_value_description}. This feature {impact_text}"
-        
-
-    return text
-
-def describe_pass_contributions_IG(contributions_ig, pass_features, feature_name_mapping=feature_name_mapping_pass):
-    text = "Below is an analysis of the most influential features affecting the model's assessment of this pass's danger level:\n"
-
-    # Extract contributions (attributions from IG)
-    contributions = contributions_ig.iloc[0].drop(['id', 'Predicted_Probability'])
-    sorted_contributions = contributions.abs().sort_values(ascending=False)
-
-    for idx, (feature, abs_contrib) in enumerate(sorted_contributions.items()):
-        raw_contrib = contributions[feature]
-
-        # # Filter by impact threshold
-        # if abs(raw_contrib) < 0.00788100733068301:
-        #     continue
-
-        # Get readable feature name + value
-        feature_display = feature_name_mapping.get(feature, feature.replace("_", " "))
-        feature_value = pass_features[feature]
-        feature_desc = describe_pass_single_feature(feature, feature_value)
-
-        # Interpret direction
-        if raw_contrib > 0:
-            direction = "increased the model's confidence in this pass being dangerous"
-        elif raw_contrib < 0:
-            direction = "led the model to be less confident about the pass's danger"
-        else:
-            direction = "had no meaningful influence on the model's confidence"
-
-        # Add to text
-        if idx == 0:
-            text += f"\n- **{feature_display}** had the strongest influence: {feature_desc}. It significantly {direction}."
-        else:
-            text += f"\n- **{feature_display}** also stood out: {feature_desc}. It {direction}."
-
-    return text
-
-
-# def describe_pass_contributions_tabnet(contributions_tabnet, pass_features, feature_name_mapping=feature_name_mapping_pass):
-#     text = "Below is an analysis of the most influential features affecting the model's assessment of this pass's danger level:\n"
-
-#     # Extract contributions (attributions from IG)
-#     contributions = contributions_tabnet.iloc[0].drop(['id', 'Predicted_Probability'])
-#     sorted_contributions = contributions.abs().sort_values(ascending=False)
-
-#     for idx, (feature, abs_contrib) in enumerate(sorted_contributions.items()):
-#         raw_contrib = contributions[feature]
-
-#         # Filter by impact threshold
-#         # if abs(raw_contrib) < 0.00788100733068301:
-#             # continue
-
-#         # Get readable feature name + value
-#         feature_display = feature_name_mapping.get(feature, feature.replace("_", " "))
-#         feature_value = pass_features[feature]
-#         feature_desc = describe_pass_single_feature(feature, feature_value)
-
-#         # Interpret direction
-#         if raw_contrib > 0:
-#             direction = "increased the model's confidence in this pass being dangerous"
-#         elif raw_contrib < 0:
-#             direction = "led the model to be less confident about the pass's danger"
-#         else:
-#             direction = "had no meaningful influence on the model's confidence"
-
-#         # Add to text
-#         if idx == 0:
-#             text += f"\n- **{feature_display}** had the strongest influence: {feature_desc}. It significantly {direction}."
-#         else:
-#             text += f"\n- **{feature_display}** also stood out: {feature_desc}. It {direction}."
-
-#     return text

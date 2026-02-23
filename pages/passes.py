@@ -1,4 +1,9 @@
 # Library imports
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="The keyword arguments have been deprecated"
+)
 from pathlib import Path
 import sys
 
@@ -40,13 +45,13 @@ from utils.utils import SimplerNet
 from classes.data_source import Passes
 from classes.visual import DistributionPlot,PassContributionPlot_Logistic, PassContributionPlot_XGBoost,PassContributionPlot_Mimic,Distributionplot_xnn_models,model_contribution_xnn
 from classes.visual import DistributionPlot,PassContributionPlot_Logistic,PassVisual,PassContributionPlot_Xnn,xnn_plot,PassContributionPlot_Logistic_event,PassContributionPlot_Logistic_pressure,PassContributionPlot_Logistic_speed,PassContributionPlot_Logistic_position
-from classes.description import PassDescription_logistic,PassDescription_xgboost, PassDescription_xNN,PassDescription_mimic, PassDescription_TabNet
+from classes.description import PassDescription_logistic,PassDescription_xgboost, PassDescription_xNN,PassDescription_mimic
 from classes.visual import DistributionPlot,PassContributionPlot_Logistic, PassContributionPlot_XGBoost,PassContributionPlot_Mimic,Distributionplot_xnn_models,model_contribution_xnn,PassContributionPlot_Logistic_position
 from classes.visual import DistributionPlot,PassContributionPlot_Logistic,PassVisual,PassContributionPlot_Xnn,xnn_plot,PassContributionPlot_Logistic_event,PassContributionPlot_Logistic_pressure,PassContributionPlot_Logistic_speed
 from classes.description import PassDescription_logistic,PassDescription_xgboost, PassDescription_xNN,PassDescription_mimic
 from classes.data_source import Passes
-from classes.visual import DistributionPlot,PassContributionPlot_Logistic,PassVisual,PassContributionPlot_Xnn,xnn_plot,PassContributionPlot_XGBoost,PassContributionPlot_TabNet
-from classes.description import PassDescription_logistic,PassDescription_xgboost, PassDescription_xNN, PassDescription_TabNet
+from classes.visual import DistributionPlot,PassContributionPlot_Logistic,PassVisual,PassContributionPlot_Xnn,xnn_plot,PassContributionPlot_XGBoost
+from classes.description import PassDescription_logistic,PassDescription_xgboost, PassDescription_xNN
 from classes.chat import Chat
 from classes.description import PassDescription_bayesian
 from classes.visual import PassContributionPlot_Bayesian
@@ -128,7 +133,9 @@ selected_pass_id = st.sidebar.selectbox("Select a pass id:", options=pass_df['id
 pass_id = selected_pass_id
 
 # Define the tabs
-tab1, tab2, tab3, tab4, tab5 , tab6 = st.tabs(["Logistic Regression", "xNN", "XGBoost", "TabNet", "Regression trees","Bayesian Classification Tree"])
+# tab1, tab2, tab3, tab5 , tab6 = st.tabs(["Logistic Regression", "xNN", "XGBoost", "Regression trees","Bayesian Classification Tree"])
+tab1, tab2, tab3= st.tabs(["Logistic Regression", "xNN", "XGBoost"])
+
 
 # Sample content
 with tab1:
@@ -137,12 +144,12 @@ with tab1:
     model = Passes.load_model_logistic(selected_competition, show_summary=True)
     pass_df_logistic = pass_df.drop(['h1','h2','h3','h4'],axis=1)
     
-    st.write(pass_df.astype(str))
+    #st.write(pass_df.astype(str))
     
-    st.markdown("<h3 style='font-size:24px; color:black;'>Feature contribution from model</h3>", unsafe_allow_html=True)
+    #st.markdown("<h3 style='font-size:24px; color:black;'>Feature contribution from model</h3>", unsafe_allow_html=True)
     
     df_contributions = pass_data.df_contributions
-    st.write(df_contributions.astype(str))
+    #st.write(df_contributions.astype(str))
 
     #logistic_contribution_describe = df_contributions.describe()
 
@@ -167,7 +174,7 @@ with tab1:
     chat = create_chat(to_hash, Chat)
 
     st.markdown(
-    f"<h5 style='font-size:18px; color:green;'>Pass ID: {pass_id} | Match Name : {selected_match_name} | xT : {xt_value}</h5>",
+    f"<h5 style='font-size:18px; color:green;'>Match Name : {selected_match_name} | xT : {xt_value:.2f}</h5>",
     unsafe_allow_html=True
     )
 
@@ -192,7 +199,7 @@ with tab2:
     model = Passes.load_event_model(selected_competition,show_summary=True)
 
    
-    st.write(df_passes_xnn.astype(str))
+    #st.write(df_passes_xnn.astype(str))
 
     df_xnn_contrib = pass_data.contributions_xNN
     xnn_models_contrib = pass_data.model_contribution_xNN
@@ -206,7 +213,7 @@ with tab2:
     event_df = pass_data.event_df
 
     ## selection xnn feature contribution of 4 models and per feature
-    st.markdown("<h3 style='font-size:18px; color:black;'>contribution from xNN model</h3>", unsafe_allow_html=True)
+    #st.markdown("<h3 style='font-size:18px; color:black;'>contribution from xNN model</h3>", unsafe_allow_html=True)
 
     contribution_xNN = {
     "All Features Contribution": df_xnn_contrib,
@@ -215,7 +222,7 @@ with tab2:
     selected_contribution_features = st.selectbox("Select a contribution table :", options=list(contribution_xNN.keys()),index=0)
     if selected_contribution_features != "Select a contribution":
         feature_contribution = contribution_xNN[selected_contribution_features]
-        st.write(feature_contribution.astype(str))
+        #st.write(feature_contribution.astype(str))
     
    
     excluded_columns = ['xT_predicted','id', 'match_id']
@@ -336,12 +343,12 @@ with tab3:
     st.header("XGBoost")
 
    # model = Passes.load_xgboost_model(selected_competition)
-    st.write(pass_df_xgboost.astype(str))
-    st.markdown("<h3 style='font-size:24px; color:black;'>Feature contribution from model</h3>", unsafe_allow_html=True)
+    #st.write(pass_df_xgboost.astype(str))
+    #st.markdown("<h3 style='font-size:24px; color:black;'>Feature contribution from model</h3>", unsafe_allow_html=True)
     #feature_contrib_df = Passes.get_feature_contributions(pass_df_xgboost, model)
     feature_contrib_df = pass_data.feature_contrib_df
     
-    st.write(feature_contrib_df.astype(str))
+    #st.write(feature_contrib_df.astype(str))
 
     #xgboost_contribution_describe = feature_contrib_df.describe()
     #xgboost_contribution_describe.to_csv("xgboost_contribution_describe.csv")
@@ -506,15 +513,15 @@ with tab5:
     st.header("Regression trees (Mimic Model)")
 
     # Drop any temp columns and show the clean pass DF
-    st.write(pass_data.pass_df_mimic.astype(str))
+    #st.write(pass_data.pass_df_mimic.astype(str))
 
     # Get mimic contributions (already computed in Passes class)
     df_contrib_mimic = pass_data.df_contributions_mimic
     if df_contrib_mimic.empty:
         st.error("Mimic contributions could not be computed due to missing required features.")
     else:
-        st.markdown("<h3 style='font-size:18px; color:black;'>Feature contribution mimic model</h3>", unsafe_allow_html=True)
-        st.write(df_contrib_mimic.astype(str))
+        #st.markdown("<h3 style='font-size:18px; color:black;'>Feature contribution mimic model</h3>", unsafe_allow_html=True)
+        #st.write(df_contrib_mimic.astype(str))
 
         #  Metrics used for plotting
         excluded_cols = ["mimic_xT", "leaf_id", "leaf_intercept", "id", "match_id"]
@@ -563,12 +570,12 @@ with tab6:
     st.header("Bayesian Classification Tree")
 
     # Raw passes
-    st.write(pass_df.drop(columns=[c for c in pass_df.columns if "_contribution" in c or c=="xT"]))
+    #st.write(pass_df.drop(columns=[c for c in pass_df.columns if "_contribution" in c or c=="xT"]))
 
     # Contributions + xT preds
     df_cb = pass_data.df_contributions_bayes
-    st.markdown("**Per-pass feature contributions & predicted xT**")
-    st.write(df_cb.astype(str))
+    #st.markdown("**Per-pass feature contributions & predicted xT**")
+    #st.write(df_cb.astype(str))
 
     # dot = pass_data.bayes_tree.to_graphviz()
     # st.markdown("**Tree structure**")

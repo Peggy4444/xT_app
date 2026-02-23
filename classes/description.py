@@ -531,34 +531,18 @@ class PassDescription_logistic(Description):
                 "You are a professional football analyst and TV commentator. "
                 "Write in an exciting and engaging, but precise and professional tone. "
                 "You are given a description of a single pass and its context. "
-                "Your task is to write a four-sentence summary of this pass.\n\n"
+                "Your task is to write a two-sentence summary of this pass.\n\n"
                 "Guidelines:\n"
-                "- The first sentence should state whether it was a good chance or not, mention the expected threat (xT) value, "
-                "and, if relevant, the probability that the possession led to a shot on goal.\n"
-                "- The second and third sentences should describe the most important factors that made the pass dangerous or safe "
-                "in clear football language (for example, pressure, spacing, passing lane, distance to goal, pass direction).\n"
-                "- The final sentence should either praise the player or give a concise piece of advice about what to consider "
-                "when attempting a similar pass.\n"
+                "- In the first sentence should describe the pass in terms of how it moved the ball, whether it was under pressure, how it by passed players and the speed of play at the time it was taken. \n"
+                "- The second sentence should highlight what aspects made the pass more or less dangerous.\n"
                 "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
                 "Use natural football terms instead.\n"
                 "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
             )
             return [{"role": "user", "content": prompt}]
- 
-
         
 
-        # def get_prompt_messages(self):
-        #     prompt = (
-        #         "You are a football commentator. You should write in an exciting and engaging way about the features contributing for pass to be a shot and is it a safe or dangerous pass."
-        #         f"You should giva a four sentence summary of the pass taken by the player. "
-        #         "The first sentence should say whether it was a good chance or not, state the expected threat value and also state the probability of expected goal. "
-        #         "The second and third sentences should describe the most important factors that contributed to the pass to be safe or dangerous. "
-        #         "If it was a good chance these two sentences chould explain what contributing factors made the pass dangerous. "
-        #         "If it wasn't particularly good chance then these two sentences chould explain why it was a safe pass. "
-        #         "Depedning on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when initiating the pass."
-        #         )
-        #     return [{"role": "user", "content": prompt}]   
+
 
 
  #class description of features for xNN
@@ -601,6 +585,11 @@ class PassDescription_xNN(Description):
             xT = contributions['xT_predicted'].iloc[0]
             x = passes['passer_x'].iloc[0]
             y = passes['passer_y'].iloc[0]
+            # Start & end coordinates
+            start_x = passes['passer_x'].iloc[0]
+            start_y = passes['passer_y'].iloc[0]
+            end_x = passes['end_x'].iloc[0]
+            end_y = passes['end_y'].iloc[0]
             team_direction = tracking['team_direction'].iloc[0]
             pressure = models_contribution['pressure based_contrib'].iloc[0]
             speed = models_contribution['speed based_contrib'].iloc[0]
@@ -645,47 +634,41 @@ class PassDescription_xNN(Description):
                             'end_distance_to_goal' : passes['end_distance_to_goal'].iloc[0],
                             'teammates_nearby' : passes['teammates_nearby'].iloc[0]
                             }
+            # NEW: origin & destination zones
+            origin_zone = sentences.classify_lateral_zone(start_y)
+            target_zone = sentences.classify_lateral_zone(end_y)
 
-            feature_descriptions = sentences.describe_pass_features(pass_features, self.competition)
-            
+            feature_descriptions = sentences.describe_pass_features_logistic(pass_features, self.competition)
+
+            # Main summary sentence(s)
             pass_description = (
-                f"{sentences.describe_xT_pass_xNN(xT,xG)}"
-                f"{sentences.describe_models_xNN(pressure,speed,position,event)} The pass is a {pass_type} originated from {sentences.describe_position_pass(x,y,team_direction)} \n and the passer is {player_name} from {team_name} team."
-                
+                f"{player_name} of {team_name} played a {pass_type} from {origin_zone} "
+                f"into {target_zone}. "
+                f"{sentences.describe_xT_pass_xNN(xT, xG)}"
             )
-            pass_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
-            
-            pass_description += '\n' + sentences.describe_pass_contributions_xNN(contributions, pass_features)
+
+            # Add feature-based narrative
+            pass_description += " " + " ".join(feature_descriptions) + "\n"
+            pass_description += "\n" + sentences.describe_pass_contributions_xNN(contributions, pass_features)
 
             with st.expander("Synthesized Text"):
                 st.write(pass_description)
             
-            return pass_description 
+            return pass_description
 
-        def get_prompt_messages_old(self):
-            prompt = (
-                "You are a football commentator. You should write in an exciting and engaging way about a shot"
-                f"You should giva a four sentence summary of the shot taken by the player. "
-                "The first sentence should say whether it was a good chance or not, state the expected goals value and also state if it was a goal. "
-                "The second and third sentences should describe the most important factors that contributed to the quality of the chance. "
-                "If it was a good chance these two sentences chould explain what contributing factors made the shot dangerous. "
-                "If it wasn't particularly good chance then these two sentences chould explain why it wasn't a good chance. "
-                "Depedning on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when shooting."
-                )
-            return [{"role": "user", "content": prompt}]
+
         def get_prompt_messages(self):
             prompt = (
-                "You are a football analyst tasked with generating a professional and tactically informed summary of a pass "
-                "that led to (or could have led to) a shot. Your goal is to explain the value of the pass using data-driven insights, "
-                "while keeping the language engaging and football-savvy, suitable for scouts, coaches, and performance analysts.\n\n"
-
-                "Write a concise 4-sentence summary of the pass:\n"
-                "1. Begin by assessing the overall threat of the pass using its xT value (expected threat) and note whether it resulted in a shot, and if so, its xG value.\n"
-                "2. In the second sentence, describe what tactical or contextual factors (like pressure, spacing, support, or positioning) influenced the outcome.\n"
-                "3. The third sentence should explain the technical execution of the pass — such as distance, angle, location, and timing.\n"
-                "4. Conclude with an insight or reflection: either praise the player’s vision and execution, or suggest what could have improved the situation.\n\n"
-
-                "Use confident, precise language, and always relate back to how the pass contributed (or failed to contribute) to shot creation and attacking effectiveness."
+                "You are a professional football analyst and TV commentator. "
+                "Write in an exciting and engaging, but precise and professional tone. "
+                "You are given a description of a single pass and its context. "
+                "Your task is to write a two-sentence summary of this pass.\n\n"
+                "Guidelines:\n"
+                "- In the first sentence should describe the pass in terms of how it moved the ball, whether it was under pressure, how it by passed players and the speed of play at the time it was taken. \n"
+                "- The second sentence should highlight what aspects made the pass more or less dangerous.\n"
+                "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
+                "Use natural football terms instead.\n"
+                "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
             )
             return [{"role": "user", "content": prompt}]
 
@@ -728,6 +711,11 @@ class PassDescription_xgboost(Description):
             xT = contributions['xT_predicted'].iloc[0]
             x = passes['passer_x'].iloc[0]
             y = passes['passer_y'].iloc[0]
+            # Start & end coordinates
+            start_x = passes['passer_x'].iloc[0]
+            start_y = passes['passer_y'].iloc[0]
+            end_x = passes['end_x'].iloc[0]
+            end_y = passes['end_y'].iloc[0]
             team_direction = tracking['team_direction'].iloc[0]
             
 
@@ -770,44 +758,58 @@ class PassDescription_xgboost(Description):
                             'end_distance_to_goal' : passes['end_distance_to_goal'].iloc[0],
                             'teammates_nearby' : passes['teammates_nearby'].iloc[0]                       
                             }
-
-            feature_descriptions = sentences.describe_pass_features(pass_features, self.competition)
             
-            pass_description = (
-                f"The pass is a {pass_type} originated from {sentences.describe_position_pass(x,y,team_direction)} \n and the passer is {player_name} from {team_name} team."
-                f"{sentences.describe_xT_pass_xgboost(xT,xG)}"
-            )
-            pass_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
+            # NEW: origin & destination zones
+            origin_zone = sentences.classify_lateral_zone(start_y)
+            target_zone = sentences.classify_lateral_zone(end_y)
 
-            pass_description += '\n' + sentences.describe_pass_contributions_xgboost(contributions, pass_features)
+            feature_descriptions = sentences.describe_pass_features_logistic(pass_features, self.competition)
+
+            # Main summary sentence(s)
+            pass_description = (
+                f"{player_name} of {team_name} played a {pass_type} from {origin_zone} "
+                f"into {target_zone}. "
+                f"{sentences.describe_xT_pass_xgboost(xT, xG)}"
+            )
+
+            # Add feature-based narrative
+            pass_description += " " + " ".join(feature_descriptions) + "\n"
+            pass_description += "\n" + sentences.describe_pass_contributions_xgboost(contributions, pass_features)
 
             with st.expander("Synthesized Text"):
                 st.write(pass_description)
             
-            return pass_description 
+            return pass_description
 
-        #def get_prompt_messages_old(self):
-        #    prompt = (
-        #        "You are a football commentator. You should write in an exciting and engaging way about a shot"
-        #        f"You should giva a four sentence summary of the shot taken by the player. "
-        #        "The first sentence should say whether it was a good chance or not, state the expected goals value and also state if it was a goal. "
-        #        "The second and third sentences should describe the most important factors that contributed to the quality of the chance. "
-        #        "If it was a good chance these two sentences chould explain what contributing factors made the shot dangerous. "
-        #        "If it wasn't particularly good chance then these two sentences chould explain why it wasn't a good chance. "
-        #        "Depedning on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when shooting."
-        #        )
+            # feature_descriptions = sentences.describe_pass_features(pass_features, self.competition)
             
+            # pass_description = (
+            #     f"The pass is a {pass_type} originated from {sentences.describe_position_pass(x,y,team_direction)} \n and the passer is {player_name} from {team_name} team."
+            #     f"{sentences.describe_xT_pass_xgboost(xT,xG)}"
+            # )
+            # pass_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
+
+            # pass_description += '\n' + sentences.describe_pass_contributions_xgboost(contributions, pass_features)
+
+            # with st.expander("Synthesized Text"):
+            #     st.write(pass_description)
+            
+            # return pass_description 
+
+
         def get_prompt_messages(self):
             prompt = (
-            "You are a football commentator. You should write in an exciting and engaging way about the features contributing for pass to be a shot and is it a safe or dangerous pass. "
-            f"You should give a four sentence summary of the pass taken by the player. "
-            "The first sentence should say whether it was a good chance or not, state the expected threat value and also state the probability of expected goal. "
-            "The second and third sentences should describe the most important factors that contributed to the pass to be safe or dangerous. "
-            "If it was a good chance these two sentences should explain what contributing factors made the pass dangerous. "
-            "If it wasn't particularly good chance then these two sentences should explain why it was a safe pass. "
-            "Depending on the quality of the chance, the final sentence should either praise the player or offer advice about what to think about when initiating the pass."
+                "You are a professional football analyst and TV commentator. "
+                "Write in an exciting and engaging, but precise and professional tone. "
+                "You are given a description of a single pass and its context. "
+                "Your task is to write a two-sentence summary of this pass.\n\n"
+                "Guidelines:\n"
+                "- In the first sentence should describe the pass in terms of how it moved the ball, whether it was under pressure, how it by passed players and the speed of play at the time it was taken. \n"
+                "- The second sentence should highlight what aspects made the pass more or less dangerous.\n"
+                "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
+                "Use natural football terms instead.\n"
+                "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
             )
-    
             return [{"role": "user", "content": prompt}]
     
 class CountryDescription(Description):

@@ -92,17 +92,18 @@ class Visual:
     #         use_container_width=True,
     #     )
     def show(self, key: str | None = None):
-            # If no key is provided, generate a unique one
         if key is None:
             key = f"{self.__class__.__name__}_{uuid.uuid4()}"
 
+        # Set height on the Plotly figure itself
+        self.fig.update_layout(height=500)
+
         st.plotly_chart(
-                self.fig,
-                config={"displayModeBar": False},
-                height=500,
-                use_container_width=True,
-                key=key,
-            )
+            self.fig,
+            config={"displayModeBar": False},
+            use_container_width=True,
+            key=key,
+        )
 
 
     def close(self):
@@ -750,7 +751,7 @@ class Distributionplot_xnn_models(Visual):
                     # text=self.annotation_text.format(
                     #     metric_name=format_metric(col), data=ser_plot[col]
                     # ),
-                    text=f"{format_metric(col)} : {ser_plot[col]:.8f}",
+                    text=f"{format_metric(col)} : {ser_plot[col]:.2f}",
                     showarrow=False,
                     font={
                         "color": rgb_to_color(self.dark_green),
@@ -797,7 +798,7 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
         if len(filtered_contrib) > 1 or len(filtered_pass) > 1:
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
-        contributions = filtered_contrib.iloc[0][metrics]
+        contributions = filtered_contrib.iloc[0][metrics].round(2)
         feature_columns = [metric.replace("_contribution", "") for metric in metrics]
         feature_values = filtered_pass.iloc[0][feature_columns]
 
@@ -855,14 +856,19 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
 
             hover_texts.append("<br>".join(hover_text))
 
+        df_plot = self.df_contributions.copy()
+        df_plot[self.metrics] = df_plot[self.metrics].round(2)
+
         self.add_group_data(
-            df_plot=self.df_contributions,
+            df_plot=df_plot,
             plots="",
             names=hover_texts,
             hover="",
             hover_string="",
             legend="All Passes",
         )
+
+
 
 ### distribution plot per feature contribution xNN
 class xnn_plot(Visual):
@@ -972,7 +978,7 @@ class xnn_plot(Visual):
                     # text=self.annotation_text.format(
                     #     metric_name=format_metric(col), data=ser_plot[col]
                     # ),
-                    text=f"{format_metric(col)} : {ser_plot[col]:.8f}",
+                    text=f"{format_metric(col)} : {ser_plot[col]:.2f}",
                     showarrow=False,
                     font={
                         "color": rgb_to_color(self.dark_green),
