@@ -9,7 +9,7 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import average_precision_score, precision_recall_curve
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-import openai
+from openai import AzureOpenAI
 from utils.datalib.numpy_helper import numpy as np
 from utils.datalib.pandas_helper import pandas as pd
 
@@ -29,7 +29,14 @@ def get_embedding(text: str, engine="text-similarity-davinci-001", use_gemini=Fa
             task_type="retrieval_document"
         )["embedding"]
     else:
-        embedding = openai.Embedding.create(input=[text], engine=engine, **kwargs)["data"][0]["embedding"]
+        from settings import GPT_BASE, GPT_VERSION, GPT_KEY
+        client = AzureOpenAI(
+            api_key=GPT_KEY,
+            api_version=GPT_VERSION,
+            azure_endpoint=GPT_BASE
+        )
+        response = client.embeddings.create(input=[text], model=engine, **kwargs)
+        embedding = response.data[0].embedding
     return embedding
 
 
@@ -45,9 +52,14 @@ async def aget_embedding(
         import google.generativeai as genai
         return (await genai.embed_content_async(model=engine, content=text, task_type="retrieval_document"))["embedding"]
     else:
-        return (await openai.Embedding.acreate(input=[text], engine=engine, **kwargs))["data"][0][
-            "embedding"
-        ]
+        from settings import GPT_BASE, GPT_VERSION, GPT_KEY
+        client = AzureOpenAI(
+            api_key=GPT_KEY,
+            api_version=GPT_VERSION,
+            azure_endpoint=GPT_BASE
+        )
+        response = await client.embeddings.create(input=[text], model=engine, **kwargs)
+        return response.data[0].embedding
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
@@ -68,8 +80,15 @@ def get_embeddings(
             task_type="retrieval_document"
         )
     else:
-        data = openai.Embedding.create(input=list_of_text, engine=engine, **kwargs).data
-    return [d["embedding"] for d in data]
+        from settings import GPT_BASE, GPT_VERSION, GPT_KEY
+        client = AzureOpenAI(
+            api_key=GPT_KEY,
+            api_version=GPT_VERSION,
+            azure_endpoint=GPT_BASE
+        )
+        response = client.embeddings.create(input=list_of_text, model=engine, **kwargs)
+        data = response.data
+    return [d.embedding for d in data]
 
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
@@ -84,8 +103,15 @@ async def aget_embeddings(
         import google.generativeai as genai
         data = (await genai.embed_content_async(model=engine, content=list_of_text, task_type="retrieval_document"))
     else:
-        data = (await openai.Embedding.acreate(input=list_of_text, engine=engine, **kwargs)).data
-    return [d["embedding"] for d in data]
+        from settings import GPT_BASE, GPT_VERSION, GPT_KEY
+        client = AzureOpenAI(
+            api_key=GPT_KEY,
+            api_version=GPT_VERSION,
+            azure_endpoint=GPT_BASE
+        )
+        response = await client.embeddings.create(input=list_of_text, model=engine, **kwargs)
+        data = response.data
+    return [d.embedding for d in data]
 
 
 def cosine_similarity(a, b):

@@ -88,13 +88,9 @@ sidebar_container = add_common_page_elements()
 page_container = st.sidebar.container()
 sidebar_container = st.sidebar.container()
 
-st.divider()
-
-st.markdown("## Passes commentator")
-
 competitions = {
-    "Allsevenskan 2022": "data/matches_2022.json",
-    "Allsevenskan 2023": "data/matches_2023.json"
+    "Allsvenskan 2022": "data/matches_2022.json",
+    "Allsvenskan 2023": "data/matches_2023.json"
 }
 
 # Select a competition
@@ -126,9 +122,40 @@ pass_df_xgboost = pass_data.pass_df_xgboost
 df_passes_xnn = pass_data.pass_df_xNN #extracting dataset for xNN from classes Pass
 pass_df_mimic = pass_data.pass_df_mimic
 
+# Get unique teams in the match
+teams = pass_df['team_name'].unique().tolist()
 
-# Dropdown showing actual pass IDs
-selected_pass_id = st.sidebar.selectbox("Select a pass id:", options=pass_df['id'].tolist())
+# Team selector (default to first team, typically home team)
+selected_team = st.sidebar.selectbox(
+    "Select Team:", 
+    options=teams,
+    index=0
+)
+
+# Filter passes by selected team
+team_pass_df = pass_df[pass_df['team_name'] == selected_team].copy()
+
+# Add sequential pass number and estimated minute
+team_pass_df['pass_number'] = range(1, len(team_pass_df) + 1)
+
+# Estimate match minute based on pass sequence (distribute passes across ~90 minutes)
+# Assuming passes happen relatively evenly throughout the match
+team_pass_df['estimated_minute'] = (team_pass_df['pass_number'] / len(team_pass_df) * 90).round().astype(int)
+
+# Create display format for pass selection: "Passer Name - Minute X'"
+team_pass_df['display'] = team_pass_df.apply(
+    lambda row: f"{row['passer_name'].title()} - {row['estimated_minute']}'", 
+    axis=1
+)
+
+# Dropdown showing passer name with estimated minute
+selected_pass_display = st.sidebar.selectbox(
+    "Select a pass:", 
+    options=team_pass_df['display'].tolist()
+)
+
+# Extract pass_id from the dataframe based on the selected display
+selected_pass_id = team_pass_df[team_pass_df['display'] == selected_pass_display]['id'].iloc[0]
 
 pass_id = selected_pass_id
 
@@ -139,68 +166,52 @@ tab1, tab2, tab3= st.tabs(["Logistic Regression", "xNN", "XGBoost"])
 
 # Sample content
 with tab1:
-    st.header("Logistic Regression")
-
-    model = Passes.load_model_logistic(selected_competition, show_summary=True)
     pass_df_logistic = pass_df.drop(['h1','h2','h3','h4'],axis=1)
-    
-    #st.write(pass_df.astype(str))
-    
-    #st.markdown("<h3 style='font-size:24px; color:black;'>Feature contribution from model</h3>", unsafe_allow_html=True)
-    
     df_contributions = pass_data.df_contributions
-    #st.write(df_contributions.astype(str))
-
-    #logistic_contribution_describe = df_contributions.describe()
 
     excluded_columns = ['xT','id', 'match_id']
     metrics = [col for col in df_contributions.columns if col not in excluded_columns]
 
-   # Build and show plot
-    st.markdown("<h3 style='font-size:24px; color:black;'>Logistic contribution plot</h3>", unsafe_allow_html=True)
+    # Header with match info
+    xt_value = df_contributions[df_contributions['id'] == pass_id]['xT']
+    xt_value = xt_value.iloc[0] if not xt_value.empty else "N/A"
+    player_name = pass_df[pass_df['id'] == pass_id]['passer_name'].iloc[0].title()
+
+    st.markdown(
+    f"<h5 style='font-size:18px; color:green;'>{selected_match_name} | {player_name} | {xt_value:.2f}</h5>",
+    unsafe_allow_html=True
+    )
+
+    # Pitch visualization
+    visuals = PassVisual(metric=None)
+    visuals.add_pass(pass_data,pass_id,home_team_color = "green" , away_team_color = "red")
+    visuals.show()
+
+    # Build and show plot
     visuals_logistic = PassContributionPlot_Logistic(df_contributions=df_contributions,df_passes=pass_df,metrics=metrics)
     visuals_logistic.add_passes(pass_df,metrics,selected_pass_id=selected_pass_id)
     visuals_logistic.annotate=True
     visuals_logistic.add_pass(contribution_df=df_contributions, pass_df=pass_df, pass_id=selected_pass_id,metrics=metrics, selected_pass_id = selected_pass_id)
     visuals_logistic.show()
 
-    xt_value = df_contributions[df_contributions['id'] == pass_id]['xT']
-    xt_value = xt_value.iloc[0] if not xt_value.empty else "N/A"
-
+    # Generated text
     descriptions = PassDescription_logistic(pass_data,df_contributions ,pass_id, selected_competition)
-
     to_hash = ("logistic",selected_match_id, pass_id)
     summaries = descriptions.stream_gpt()
     chat = create_chat(to_hash, Chat)
 
-    st.markdown(
-    f"<h5 style='font-size:18px; color:green;'>Match Name : {selected_match_name} | xT : {xt_value:.2f}</h5>",
-    unsafe_allow_html=True
-    )
-
-    visuals = PassVisual(metric=None)
-    visuals.add_pass(pass_data,pass_id,home_team_color = "green" , away_team_color = "red")
-    visuals.show()
     if summaries:
         chat.add_message(summaries)
 
     chat.state = "default"
     chat.display_messages()
 
+    # Model information at bottom
+    with st.expander("Logistic Regression Model Details", expanded=False):
+        model = Passes.load_model_logistic(selected_competition, show_summary=True)
 
   
 with tab2:
-    st.header("xNN")
-    
-    st.markdown("<h3 style='font-size:18px; color:black;'>Logistic models based on features classification</h3>", unsafe_allow_html=True)
-    model = Passes.load_pressure_model(selected_competition, show_summary=True)
-    model = Passes.load_speed_model(selected_competition,show_summary=True)
-    model = Passes.load_position_model(selected_competition, show_summary=True)
-    model = Passes.load_event_model(selected_competition,show_summary=True)
-
-   
-    #st.write(df_passes_xnn.astype(str))
-
     df_xnn_contrib = pass_data.contributions_xNN
     xnn_models_contrib = pass_data.model_contribution_xNN
     contrib_pressure = pass_data.df_contributions_pressure
@@ -212,24 +223,24 @@ with tab2:
     position_df = pass_data.position_df
     event_df = pass_data.event_df
 
-    ## selection xnn feature contribution of 4 models and per feature
-    #st.markdown("<h3 style='font-size:18px; color:black;'>contribution from xNN model</h3>", unsafe_allow_html=True)
+    # Header with match info
+    xt_value = df_xnn_contrib[df_xnn_contrib['id'] == pass_id]['xT_predicted']
+    xt_value = xt_value.iloc[0] if not xt_value.empty else "N/A"
+    player_name = pass_df[pass_df['id'] == pass_id]['passer_name'].iloc[0].title()
 
-    contribution_xNN = {
-    "All Features Contribution": df_xnn_contrib,
-    "Model contribution" : xnn_models_contrib
-    }
-    selected_contribution_features = st.selectbox("Select a contribution table :", options=list(contribution_xNN.keys()),index=0)
-    if selected_contribution_features != "Select a contribution":
-        feature_contribution = contribution_xNN[selected_contribution_features]
-        #st.write(feature_contribution.astype(str))
-    
-   
+    st.markdown(
+    f"<h5 style='font-size:18px; color:green;'>{selected_match_name} | {player_name} | {xt_value:.2f}</h5>",
+    unsafe_allow_html=True
+    )
+
+    # Pitch visualization
+    visuals = PassVisual(metric=None)
+    visuals.add_pass(pass_data,pass_id,home_team_color = "green" , away_team_color = "red")
+    visuals.show()
+
+    # Contribution analysis - moved to expander
     excluded_columns = ['xT_predicted','id', 'match_id']
     metrics = [col for col in df_xnn_contrib.columns if col not in excluded_columns]
-
-   # Build and show plot
-    st.markdown("<h3 style='font-size:18px; color:black;'>Xnn contribution plot</h3>", unsafe_allow_html=True)
 
     #xNN submodels contribution plot
     model_xnn_cols = ['id','xT_predicted']
@@ -255,18 +266,7 @@ with tab2:
     visuals_Xnn_Pressure.add_pass(contrib_pressure,pressure_df, pass_id=selected_pass_id, metrics=metrics_pressure, selected_pass_id = selected_pass_id)
     plot_contribution_pressure = visuals_Xnn_Pressure.fig 
 
-
-    #pressure based model contribution plot
-    pressure_cols = ['id']
-    metrics_pressure = [col for col in contrib_pressure.columns if col not in pressure_cols]
-    visuals_Xnn_Pressure = PassContributionPlot_Logistic_pressure(contrib_pressure,pressure_df,metrics_pressure)
-    visuals_Xnn_Pressure.add_passes(contrib_pressure,metrics_pressure,selected_pass_id=selected_pass_id)
-    visuals_Xnn_Pressure.annotate = True
-    visuals_Xnn_Pressure.add_pass(contrib_pressure,pressure_df, pass_id, metrics=metrics_pressure, selected_pass_id = selected_pass_id)
-    plot_contribution_pressure = visuals_Xnn_Pressure.fig 
-
-
-    # #Speed based model contribution plot
+    # Speed based model contribution plot
     speed_cols = ['id']
     metrics_speed = [col for col in contrib_speed.columns if col not in speed_cols]
     visuals_Xnn_speed = PassContributionPlot_Logistic_speed(contrib_speed,speed_df,metrics_speed)
@@ -274,7 +274,6 @@ with tab2:
     visuals_Xnn_speed.annotate = True
     visuals_Xnn_speed.add_pass(contrib_speed,speed_df, pass_id=selected_pass_id, metrics=metrics_speed, selected_pass_id = selected_pass_id)
     plot_contribution_speed = visuals_Xnn_speed.fig 
-
 
     #position based model contribution plot
     position_cols = ['id']
@@ -285,7 +284,7 @@ with tab2:
     visuals_Xnn_position.add_pass(contrib_position,position_df, pass_id, metrics_position, selected_pass_id = selected_pass_id)
     plot_contribution_position = visuals_Xnn_position.fig 
 
-    # #event based model contribution plot
+    # event based model contribution plot
     event_cols = ['id']
     metrics_event = [col for col in contrib_event.columns if col not in event_cols]
     visuals_Xnn_event = PassContributionPlot_Logistic_event(contrib_event,event_df,metrics_event)
@@ -302,9 +301,17 @@ with tab2:
     "H3:position based model" : plot_contribution_position,
     "H4:event based model" : plot_contribution_event
     }
-    selected_contribution_plot = st.selectbox("Select a plot:", options=list(plots.keys()),index=0)
-    placeholder = st.empty()
 
+    # Contribution plot selectors and display
+    contribution_xNN = {
+    "All Features Contribution": df_xnn_contrib,
+    "Model contribution" : xnn_models_contrib
+    }
+    selected_contribution_features = st.selectbox("Select a contribution table :", options=list(contribution_xNN.keys()),index=0)
+    if selected_contribution_features != "Select a contribution":
+        feature_contribution = contribution_xNN[selected_contribution_features]
+
+    selected_contribution_plot = st.selectbox("Select a plot:", options=list(plots.keys()),index=0)
 
     if selected_contribution_plot != "Select a plot…":
         fig = plots[selected_contribution_plot]
@@ -313,49 +320,48 @@ with tab2:
         width=1000,    # in pixels
         height=500,   # in pixels
         margin=dict(l=10, r=10, t=40 + 20, b=40 + 20),
-
         )
-        placeholder.write(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
-    xt_value = df_xnn_contrib[df_xnn_contrib['id'] == pass_id]['xT_predicted']
-    xt_value = xt_value.iloc[0] if not xt_value.empty else "N/A"
- 
-    descriptions = PassDescription_xNN(pass_data,df_xnn_contrib,xnn_models_contrib,pass_id,selected_competition)
-
-    to_hash = ("xNN",selected_match_id, pass_id)
+    # Generated text
+    descriptions = PassDescription_xNN(pass_data, df_xnn_contrib, xnn_models_contrib, pass_id, selected_competition)
+    to_hash = ("xnn", selected_match_id, pass_id)
     summaries = descriptions.stream_gpt()
     chat = create_chat(to_hash, Chat)
 
-    st.markdown(
-    f"<h5 style='font-size:18px; color:green;'>Pass ID: {pass_id} | Match Name : {selected_match_name} | xT : {xt_value}</h5>",
-    unsafe_allow_html=True
-    )
-    visuals = PassVisual(metric=None)
-    visuals.add_pass(pass_data,pass_id,home_team_color = "green" , away_team_color = "red")
-    visuals.show()
-    
     if summaries:
         chat.add_message(summaries)
 
+    chat.state = "default"
     chat.display_messages()
+
+    # Model information at bottom
+    with st.expander("xNN Model Details", expanded=False):
+        st.markdown("**Feature-based Models:**")
+        model = Passes.load_pressure_model(selected_competition, show_summary=True)
+        model = Passes.load_speed_model(selected_competition, show_summary=True)
+        model = Passes.load_position_model(selected_competition, show_summary=True)
+        model = Passes.load_event_model(selected_competition, show_summary=True)
  
 with tab3:
-    st.header("XGBoost")
-
-   # model = Passes.load_xgboost_model(selected_competition)
-    #st.write(pass_df_xgboost.astype(str))
-    #st.markdown("<h3 style='font-size:24px; color:black;'>Feature contribution from model</h3>", unsafe_allow_html=True)
-    #feature_contrib_df = Passes.get_feature_contributions(pass_df_xgboost, model)
     feature_contrib_df = pass_data.feature_contrib_df
-    
-    #st.write(feature_contrib_df.astype(str))
 
-    #xgboost_contribution_describe = feature_contrib_df.describe()
-    #xgboost_contribution_describe.to_csv("xgboost_contribution_describe.csv")
+    # Header with match info
+    xt_value_xgboost = feature_contrib_df[feature_contrib_df['id'] == pass_id]['xT_predicted']
+    xt_value_xgboost = xt_value_xgboost.iloc[0] if not xt_value_xgboost.empty else "N/A"
+    player_name = pass_df[pass_df['id'] == pass_id]['passer_name'].iloc[0].title()
+
+    st.markdown(
+    f"<h5 style='font-size:18px; color:green;'>{selected_match_name} | {player_name} | {xt_value_xgboost:.2f}</h5>",
+    unsafe_allow_html=True
+    )
+
+    # Pitch visualization
+    visuals = PassVisual(metric=None)
+    visuals.add_pass(pass_data,pass_id,home_team_color = "green" , away_team_color = "red")
+    visuals.show()
 
     # Show the XGBoost feature contribution plot
-    st.markdown("<h3 style='font-size:24px; color:black;'>XGBoost contribution plot</h3>", unsafe_allow_html=True)
-
     excluded_columns = ['xT_predicted','id', 'match_id']
     metrics = [col for col in feature_contrib_df.columns if col not in excluded_columns]
 
@@ -428,33 +434,38 @@ with tab3:
         # fig = plotter.plot()
         # st.plotly_chart(fig, use_container_width=True)
     # Show results
-    #st.subheader("Counterfactuals for this pass")
-    #st.dataframe(result_df)
-
-
-
-    xt_value_xgboost = feature_contrib_df[feature_contrib_df['id'] == pass_id]['xT_predicted']
-    xt_value_xgboost = xt_value_xgboost.iloc[0] if not xt_value_xgboost.empty else "N/A"
-
-
-    descriptions = PassDescription_xgboost(pass_data,feature_contrib_df,pass_id, selected_competition)
     
+    # Generated text
+    descriptions = PassDescription_xgboost(pass_data,feature_contrib_df,pass_id, selected_competition)
     to_hash = ("xgBoost",selected_match_id, pass_id)
     summaries = descriptions.stream_gpt()
     chat = create_chat(to_hash, Chat)
-
-    st.markdown(
-    f"<h5 style='font-size:18px; color:green;'>Pass ID: {pass_id} | Match Name : {selected_match_name} | xT : {xt_value_xgboost}</h5>",
-    unsafe_allow_html=True
-    )
-    visuals = PassVisual(metric=None)
-    visuals.add_pass(pass_data,pass_id,home_team_color = "green" , away_team_color = "red")
-    visuals.show()
     
     if summaries:
         chat.add_message(summaries)
 
     chat.display_messages()
+
+    # Model information at bottom
+    with st.expander("XGBoost Model Details", expanded=False):
+        model = pass_data.load_xgboost_model(selected_competition)
+        if model:
+            st.markdown("**XGBoost Model Information:**")
+            st.write(model)
+            
+            # Display feature importance if available
+            try:
+                import pandas as pd
+                feature_names = [col for col in pass_df_xgboost.columns if col not in ['id', 'match_id', 'xT']]
+                if hasattr(model, 'feature_importances_'):
+                    importance_df = pd.DataFrame({
+                        'Feature': feature_names[:len(model.feature_importances_)],
+                        'Importance': model.feature_importances_
+                    }).sort_values('Importance', ascending=False)
+                    st.markdown("**Feature Importances:**")
+                    st.dataframe(importance_df)
+            except Exception as e:
+                st.write(f"Could not display feature importances: {e}")
 
 # with tab4:
 #     st.header("TabNet")

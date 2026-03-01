@@ -662,8 +662,8 @@ def describe_shot_contributions1(shot_contributions, feature_name_mapping=featur
 #thresholds for contribution features
 def read_pass_feature_thresholds(competition):
     competitions_dict_params = {
-        "Allsevenskan 2022": "data/feature_description_passes.csv",
-        "Allsevenskan 2023": "data/feature_description_passes.csv"
+        "Allsvenskan 2022": "data/feature_description_passes.csv",
+        "Allsvenskan 2023": "data/feature_description_passes.csv"
     }
 
     file_path = competitions_dict_params.get(competition)
@@ -689,14 +689,15 @@ def describe_pass_features(features, competition):
         descriptions.append(" It was a long pass")
 
     # start_angle_to_goal
+    dist_covered_toward_goal = features['start_distance_to_goal'] - features['end_distance_to_goal']
 
     if features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[4]:
-        descriptions.append(f" with narrow angle covering distance {features['start_distance_to_goal']:.2f}m aiming towards the goal area, a bold attacking move.")
+        descriptions.append(f" with narrow angle covering distance {dist_covered_toward_goal:.2f}m aiming towards the goal area, a bold attacking move.")
         
     elif features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[5]:
-        descriptions.append(f" with moderate angle covering distance {features['start_distance_to_goal']:.2f}m aiming to the goal area, maintainig control while progressing.")
+        descriptions.append(f" with moderate angle covering distance {dist_covered_toward_goal:.2f}m aiming to the goal area, maintainig control while progressing.")
     else:
-        descriptions.append(f" with wide-angle covering distance {features['start_distance_to_goal']:.2f}m aiming to the goal area, possibly trying to spread out the defense and create space.")
+        descriptions.append(f" with wide-angle covering distance {dist_covered_toward_goal:.2f}m aiming to the goal area, possibly trying to spread out the defense and create space.")
     
 
     # teammates behind and beyond 
@@ -745,8 +746,8 @@ def describe_pass_features(features, competition):
 ### for logistic model 
 def read_pass_feature_thresholds_logistic(competition):
     competitions_dict_params = {
-        "Allsevenskan 2022": "data/feature_description_passes.csv",
-        "Allsevenskan 2023": "data/feature_description_passes.csv"
+        "Allsvenskan 2022": "data/feature_description_passes.csv",
+        "Allsvenskan 2023": "data/feature_description_passes.csv"
     }
 
     file_path = competitions_dict_params.get(competition)
@@ -772,7 +773,7 @@ def describe_pass_features_logistic(features, competition):
         descriptions.append("It was a long pass")
 
     # --- Start angle & distance to goal ---
-    dist_to_goal = round(features['start_distance_to_goal'])  # no unnecessary decimals
+    dist_to_goal = round(features['start_distance_to_goal'] - features['end_distance_to_goal'])  # net distance toward goal
 
     if features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[4]:
         descriptions.append(
@@ -864,14 +865,15 @@ def describe_pass_features_logistic1(features, competition):
         descriptions.append(" It was a long pass")
 
     # start_angle_to_goal
+    dist_covered_toward_goal = features['start_distance_to_goal'] - features['end_distance_to_goal']
 
     if features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[4]:
-        descriptions.append(f" with narrow angle covering distance {features['start_distance_to_goal']:.2f}m aiming towards the goal area, a bold attacking move.")
+        descriptions.append(f" with narrow angle covering distance {dist_covered_toward_goal:.2f}m aiming towards the goal area, a bold attacking move.")
         
     elif features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[5]:
-        descriptions.append(f" with moderate angle covering distance {features['start_distance_to_goal']:.2f}m aiming to the goal area, maintainig control while progressing.")
+        descriptions.append(f" with moderate angle covering distance {dist_covered_toward_goal:.2f}m aiming to the goal area, maintainig control while progressing.")
     else:
-        descriptions.append(f" with wide-angle covering distance {features['start_distance_to_goal']:.2f}m aiming to the goal area, possibly trying to spread out the defense and create space.")
+        descriptions.append(f" with wide-angle covering distance {dist_covered_toward_goal:.2f}m aiming to the goal area, possibly trying to spread out the defense and create space.")
     
 
     # teammates behind and beyond 

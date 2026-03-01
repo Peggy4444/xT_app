@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import openai
+from openai import AzureOpenAI
 from utils.embeddings_utils import get_embedding, cosine_similarity
 import os
 
@@ -30,9 +30,6 @@ class Embeddings:
             genai.configure(api_key=GEMINI_API_KEY)
             ENGINE = GEMINI_EMBEDDING_MODEL
         else:
-            openai.api_base = GPT3_BASE
-            openai.api_version = GPT3_VERSION
-            openai.api_key = GPT3_KEY
             # text-embedding-ada-002 (Version 2) model
             ENGINE = ENGINE_ADA
         embedding = get_embedding(query, engine=ENGINE, use_gemini=USE_GEMINI)
@@ -63,9 +60,6 @@ class Embeddings:
             genai.configure(api_key=GEMINI_API_KEY)
             ENGINE = GEMINI_EMBEDDING_MODEL
         else:
-            openai.api_base = GPT3_BASE
-            openai.api_version = GPT3_VERSION
-            openai.api_key = GPT3_KEY
             # text-embedding-ada-002 (Version 2) model
             ENGINE = ENGINE_ADA
         embedding = get_embedding(query, engine=ENGINE, use_gemini=USE_GEMINI)

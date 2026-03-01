@@ -996,8 +996,8 @@ class Passes(Data):
     
 
     def read_model_params(self, competition):
-        competitions_dict_prams = {"Allsevenskan 2022": "data/params_logistic.csv",
-    "Allsevenskan 2023": "data/params_logistic.csv"}
+        competitions_dict_prams = {"Allsvenskan 2022": "data/params_logistic.csv",
+    "Allsvenskan 2023": "data/params_logistic.csv"}
 
         file_path = competitions_dict_prams.get(competition)
 
@@ -1021,8 +1021,8 @@ class Passes(Data):
     
 
     def read_position_model_params(self, competition):
-        competitions_dict_prams = {"Allsevenskan 2022": "data/position_model_params.csv",
-    "Allsevenskan 2023": "data/position_model_params.csv"}
+        competitions_dict_prams = {"Allsvenskan 2022": "data/position_model_params.csv",
+    "Allsvenskan 2023": "data/position_model_params.csv"}
 
         file_path = competitions_dict_prams.get(competition)
 
@@ -1046,8 +1046,8 @@ class Passes(Data):
         
 
     def read_speed_model_params(self, competition):
-        competitions_dict_prams = {"Allsevenskan 2022": "data/speed_model_params.csv",
-    "Allsevenskan 2023": "data/speed_model_params.csv"}
+        competitions_dict_prams = {"Allsvenskan 2022": "data/speed_model_params.csv",
+    "Allsvenskan 2023": "data/speed_model_params.csv"}
 
         file_path = competitions_dict_prams.get(competition)
 
@@ -1071,8 +1071,8 @@ class Passes(Data):
         
     
     def read_pressure_model_params(self, competition):
-        competitions_dict_prams = {"Allsevenskan 2022": "data/pressure_model_params.csv",
-    "Allsevenskan 2023": "data/pressure_model_params.csv"}
+        competitions_dict_prams = {"Allsvenskan 2022": "data/pressure_model_params.csv",
+    "Allsvenskan 2023": "data/pressure_model_params.csv"}
 
         file_path = competitions_dict_prams.get(competition)
 
@@ -1095,8 +1095,8 @@ class Passes(Data):
             return None
         
     def read_event_model_params(self, competition):
-        competitions_dict_prams = {"Allsevenskan 2022": "data/event_model_params.csv",
-    "Allsevenskan 2023": "data/event_model_params.csv"}
+        competitions_dict_prams = {"Allsvenskan 2022": "data/event_model_params.csv",
+    "Allsvenskan 2023": "data/event_model_params.csv"}
 
         file_path = competitions_dict_prams.get(competition)
 
@@ -1165,8 +1165,8 @@ class Passes(Data):
     @staticmethod
     def load_mimic_tree(competition):
         competitions_dict = {
-            "Allsevenskan 2022": "data/mimic_tree.pkl",
-            "Allsevenskan 2023": "data/mimic_tree.pkl",
+            "Allsvenskan 2022": "data/mimic_tree.pkl",
+            "Allsvenskan 2023": "data/mimic_tree.pkl",
             
             
         }
@@ -1190,8 +1190,8 @@ class Passes(Data):
     @staticmethod
     def load_leaf_models(competition):
         competitions_dict = {
-            "Allsevenskan 2022": "data/leaf_models.pkl",
-            "Allsevenskan 2023": "data/leaf_models.pkl",
+            "Allsvenskan 2022": "data/leaf_models.pkl",
+            "Allsvenskan 2023": "data/leaf_models.pkl",
             
             
         }
@@ -1216,8 +1216,8 @@ class Passes(Data):
     @staticmethod
     def load_mimic_feature_names(competition):
         competitions_dict = {
-            "Allsevenskan 2022": "data/mimic_feature_names.pkl",
-            "Allsevenskan 2023": "data/mimic_feature_names.pkl",
+            "Allsvenskan 2022": "data/mimic_feature_names.pkl",
+            "Allsvenskan 2023": "data/mimic_feature_names.pkl",
             
             
         }
@@ -1242,8 +1242,8 @@ class Passes(Data):
     @staticmethod
     def load_leaf_feature_means(competition):
         competitions_dict = {
-            "Allsevenskan 2022": "data/leaf_feature_means.pkl",
-            "Allsevenskan 2023": "data/leaf_feature_means.pkl",
+            "Allsvenskan 2022": "data/leaf_feature_means.pkl",
+            "Allsvenskan 2023": "data/leaf_feature_means.pkl",
             
             
         }
@@ -1269,8 +1269,8 @@ class Passes(Data):
     def load_model_logistic(competition, show_summary=False):
 
         competitions_dict = {
-            "Allsevenskan 2022": "data/logistic_model_joblib.sav",
-            "Allsevenskan 2023": "data/logistic_model_joblib.sav",
+            "Allsvenskan 2022": "data/logistic_model_joblib.sav",
+            "Allsvenskan 2023": "data/logistic_model_joblib.sav",
             
             
         }
@@ -1301,8 +1301,8 @@ class Passes(Data):
     def load_pressure_model(competition, show_summary=False):
 
         competitions_dict = {
-            "Allsevenskan 2022": "data/pressure_based_model.sav",
-            "Allsevenskan 2023": "data/pressure_based_model.sav"
+            "Allsvenskan 2022": "data/pressure_based_model.sav",
+            "Allsvenskan 2023": "data/pressure_based_model.sav"
         }
 
         saved_model_path = competitions_dict.get(competition)
@@ -1331,8 +1331,8 @@ class Passes(Data):
     def load_speed_model(competition, show_summary=False):
 
         competitions_dict = {
-            "Allsevenskan 2022": "data/speed_based_model.sav",
-            "Allsevenskan 2023": "data/speed_based_model.sav"
+            "Allsvenskan 2022": "data/speed_based_model.sav",
+            "Allsvenskan 2023": "data/speed_based_model.sav"
         }
 
         saved_model_path = competitions_dict.get(competition)
@@ -1360,8 +1360,8 @@ class Passes(Data):
     def load_position_model(competition, show_summary=False):
 
         competitions_dict = {
-            "Allsevenskan 2022": "data/position_based_model.sav",
-            "Allsevenskan 2023": "data/position_based_model.sav"
+            "Allsvenskan 2022": "data/position_based_model.sav",
+            "Allsvenskan 2023": "data/position_based_model.sav"
         }
 
         saved_model_path = competitions_dict.get(competition)
@@ -1390,8 +1390,8 @@ class Passes(Data):
     def load_event_model(competition, show_summary=False):
 
         competitions_dict = {
-            "Allsevenskan 2022": "data/event_based_model.sav",
-            "Allsevenskan 2023": "data/event_based_model.sav"
+            "Allsvenskan 2022": "data/event_based_model.sav",
+            "Allsvenskan 2023": "data/event_based_model.sav"
         }
 
         saved_model_path = competitions_dict.get(competition)
@@ -1419,8 +1419,8 @@ class Passes(Data):
     def load_xNN(self, competition):
         # Use the new, portable state_dict file
         competitions_dict = {
-            "Allsevenskan 2022": "data/simplernet_state.pth",
-            "Allsevenskan 2023": "data/simplernet_state.pth",
+            "Allsvenskan 2022": "data/simplernet_state.pth",
+            "Allsvenskan 2023": "data/simplernet_state.pth",
         }
 
         rel_path = competitions_dict.get(competition)
@@ -1558,8 +1558,8 @@ class Passes(Data):
     
     def load_xgboost_model(self,competition):
         competitions_dict = {
-            "Allsevenskan 2022": "data/XGBoost_Model_joblib.sav",
-            "Allsevenskan 2023": "data/XGBoost_Model_joblib.sav"
+            "Allsvenskan 2022": "data/XGBoost_Model_joblib.sav",
+            "Allsvenskan 2023": "data/XGBoost_Model_joblib.sav"
         }
 
         saved_model_path = competitions_dict.get(competition)
@@ -1689,8 +1689,8 @@ class Passes(Data):
 
     def load_tabnet_model(self, competition):
             competitions_dict = {
-                "Allsevenskan 2022": "data/tabnet_model.zip",
-                "Allsevenskan 2023": "data/tabnet_model.zip"
+                "Allsvenskan 2022": "data/tabnet_model.zip",
+                "Allsvenskan 2023": "data/tabnet_model.zip"
             }
             
             network_path = competitions_dict.get(competition)

@@ -4,7 +4,7 @@ from typing import List, Union, Dict, Optional
 
 import pandas as pd
 import tiktoken
-import openai
+from openai import AzureOpenAI
 import numpy as np
 
 import utils.sentences as sentences
@@ -20,8 +20,6 @@ else:
     from settings import GPT_BASE, GPT_VERSION, GPT_KEY, GPT_ENGINE
 
 import streamlit as st
-
-openai.api_type = "azure"
 
 
 class Description(ABC):
@@ -197,10 +195,6 @@ class Description(ABC):
             str
         """
 
-
-        st.expander("Description messages", expanded=False).write(self.messages)
-        st.expander("Chat transcript", expanded=False).write(self.messages)
-
         if USE_GEMINI:
             import google.generativeai as genai
 
@@ -222,17 +216,19 @@ class Description(ABC):
             answer = response.text
         else:
             # Use OpenAI API
-            openai.api_base = GPT_BASE
-            openai.api_version = GPT_VERSION
-            openai.api_key = GPT_KEY
+            client = AzureOpenAI(
+                api_key=GPT_KEY,
+                api_version=GPT_VERSION,
+                azure_endpoint=GPT_BASE
+            )
 
-            response = openai.ChatCompletion.create(
-                engine=GPT_ENGINE,
+            response = client.chat.completions.create(
+                model=GPT_ENGINE,
                 messages=self.messages,
                 temperature=temperature,
             )
 
-            answer = response["choices"][0]["message"]["content"]
+            answer = response.choices[0].message.content
 
         return answer
 
@@ -456,7 +452,7 @@ class PassDescription_logistic(Description):
             if passes.empty:
                 raise ValueError(f"No pass found with ID {self.pass_id}")
             
-            player_name = passes['passer_name'].iloc[0]
+            player_name = passes['passer_name'].iloc[0].title()
             team_name = passes['team_name'].iloc[0]
             xT = contributions['xT'].iloc[0]
             xG = passes['possession_xg'].iloc[0]
@@ -706,7 +702,7 @@ class PassDescription_xgboost(Description):
             if passes.empty:
                 raise ValueError(f"No shot found with ID {self.shot_id}")
             
-            player_name = passes['passer_name'].iloc[0]
+            player_name = passes['passer_name'].iloc[0].title()
             team_name = passes['team_name'].iloc[0]
             xT = contributions['xT_predicted'].iloc[0]
             x = passes['passer_x'].iloc[0]
@@ -942,7 +938,7 @@ class PassDescription_mimic(Description):
         if passes.empty:
             raise ValueError(f"No pass found with ID {self.pass_id}")
 
-        player_name = passes['passer_name'].iloc[0]
+        player_name = passes['passer_name'].iloc[0].title()
         team_name = passes['team_name'].iloc[0]
         x = passes['passer_x'].iloc[0]
         y = passes['passer_y'].iloc[0]
@@ -1040,7 +1036,7 @@ class PassDescription_bayesian(Description):
         if passes.empty:
             raise ValueError(f"No pass found with ID {self.pass_id}")
 
-        player_name = passes['passer_name'].iloc[0]
+        player_name = passes['passer_name'].iloc[0].title()
         team_name = passes['team_name'].iloc[0]
         x = passes['passer_x'].iloc[0]
         y = passes['passer_y'].iloc[0]
@@ -1139,7 +1135,7 @@ class PassDescription_TabNet(Description):
             if passes.empty:
                 raise ValueError(f"No shot found with ID {self.shot_id}")
             
-            player_name = passes['passer_name'].iloc[0]
+            player_name = passes['passer_name'].iloc[0].title()
             team_name = passes['team_name'].iloc[0]
             xT = contributions['Predicted_Probability'].iloc[0]
             x = passes['passer_x'].iloc[0]
