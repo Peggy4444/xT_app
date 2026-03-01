@@ -206,9 +206,9 @@ with tab1:
     chat.state = "default"
     chat.display_messages()
 
-    # Show full OpenAI prompt
-    with st.expander("View Full OpenAI Prompt", expanded=False):
-        st.markdown("**Messages sent to OpenAI:**")
+    # Show full LLM prompt
+    with st.expander("View Full LLM Prompt", expanded=False):
+        st.markdown("**Messages sent to LLM:**")
         for i, msg in enumerate(descriptions.messages):
             role = msg.get('role', 'unknown')
             content = msg.get('content', '')
@@ -345,9 +345,9 @@ with tab2:
     chat.state = "default"
     chat.display_messages()
 
-    # Show full OpenAI prompt
-    with st.expander("View Full OpenAI Prompt", expanded=False):
-        st.markdown("**Messages sent to OpenAI:**")
+    # Show full LLM prompt
+    with st.expander("View Full LLM Prompt", expanded=False):
+        st.markdown("**Messages sent to LLM:**")
         for i, msg in enumerate(descriptions.messages):
             role = msg.get('role', 'unknown')
             content = msg.get('content', '')
@@ -467,9 +467,9 @@ with tab3:
     chat.state = "default"
     chat.display_messages()
 
-    # Show full OpenAI prompt
-    with st.expander("View Full OpenAI Prompt", expanded=False):
-        st.markdown("**Messages sent to OpenAI:**")
+    # Show full LLM prompt
+    with st.expander("View Full LLM Prompt", expanded=False):
+        st.markdown("**Messages sent to LLM:**")
         for i, msg in enumerate(descriptions.messages):
             role = msg.get('role', 'unknown')
             content = msg.get('content', '')

@@ -804,7 +804,7 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
         total_passes = len(self.df_contributions)
         pass_positions = list(self.df_contributions["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
@@ -864,7 +864,7 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')
@@ -1049,7 +1049,7 @@ class PassContributionPlot_Xnn(xnn_plot):
         total_passes = len(self.df_xnn_contrib)
         pass_positions = list(self.df_xnn_contrib["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
@@ -1122,7 +1122,7 @@ class PassContributionPlot_Xnn(xnn_plot):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')
@@ -1208,7 +1208,7 @@ class model_contribution_xnn(Distributionplot_xnn_models):
         total_passes = len(self.xnn_models_contrib)
         pass_positions = list(self.xnn_models_contrib["id"])
         pass_index = pass_positions.index(selected_pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass_xnn.iloc[0].get('team_name', 'Unknown')
@@ -1352,7 +1352,7 @@ class PassContributionPlot_Logistic_pressure(Distributionplot_xnn_models):
         total_passes = len(self.df_contributions_pressure)
         pass_positions = list(self.df_contributions_pressure["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass_pressure.iloc[0].get('team_name', 'Unknown')
@@ -1429,7 +1429,7 @@ class PassContributionPlot_Logistic_pressure(Distributionplot_xnn_models):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')
@@ -1503,7 +1503,7 @@ class PassContributionPlot_Logistic_speed(Distributionplot_xnn_models):
         total_passes = len(self.df_contributions_speed)
         pass_positions = list(self.df_contributions_speed["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
@@ -1564,7 +1564,7 @@ class PassContributionPlot_Logistic_speed(Distributionplot_xnn_models):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')
@@ -1647,7 +1647,7 @@ class PassContributionPlot_Logistic_position(Distributionplot_xnn_models):
         total_passes = len(self.df_contributions_position)
         pass_positions = list(self.df_contributions_position["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
@@ -1712,7 +1712,7 @@ class PassContributionPlot_Logistic_position(Distributionplot_xnn_models):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')
@@ -1786,7 +1786,7 @@ class PassContributionPlot_Logistic_event(Distributionplot_xnn_models):
         total_passes = len(self.df_contributions_event)
         pass_positions = list(self.df_contributions_event["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
@@ -1848,7 +1848,7 @@ class PassContributionPlot_Logistic_event(Distributionplot_xnn_models):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')
@@ -2077,7 +2077,7 @@ class PassContributionPlot_XGBoost(DistributionPlot_XGBoost):
         total_passes = len(self.feature_contrib_df)
         pass_positions = list(self.feature_contrib_df["id"])
         pass_index = pass_positions.index(pass_id)
-        estimated_minute = int((pass_index / total_passes * 90))
+        estimated_minute = int(round((pass_index + 1) / total_passes * 90))
         
         # Get team and player
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
@@ -2141,7 +2141,7 @@ class PassContributionPlot_XGBoost(DistributionPlot_XGBoost):
                 pass_features = pass_features.iloc[0]
                 
                 # Calculate estimated minute
-                estimated_minute = int((idx / total_passes * 90))
+                estimated_minute = int(round((idx + 1) / total_passes * 90))
                 
                 # Get team and player
                 team = pass_features.get('team_name', 'Unknown')

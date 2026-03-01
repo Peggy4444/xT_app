@@ -1,18 +1,10 @@
-# TwelveGPT Educational
+# xT Model Translation App
 
 ## Description
 
-TwelveGPT Educational is a basic retrieval augmented chatbot for making reports about data.
-The system is set up in a general way, to allow users to build bots which talk about data. 
+This application builds on the Twelve Educational framework to demonstrate how different machine learning models can translate their outputs into natural language. The system showcases multiple xT (expected threat) models for football pass analysis and uses AI to generate human-readable explanations of their predictions.
 
-The football scout botdisplays a distribution plot regarding football player's performance in various metrics. It then starts a chat giving an AI generated summary of the player's performance and asks a variety of questions about the player. 
-
-This is **not** the Twelve GPT product, but rather a (very) stripped down version of our code 
-to help people who would like to learn how to build bots to talk about football data. There are lots of things which Twelve GPT can do, which TwelveGPT Educational cannot do. But we want more people to learn about the methods we use and to do this **TwelveGPT Educational** is an excellent alternative. We have thus used the the GNU GPL license which requires that all the released improved versions are also be free software. This will allow us to learn from each other in developing better 
-
-If you work for a footballing organisation and would like to see a demo of the full Twelve GPT product then please email us at hello@twelve.football.
-
-The design and code for this project was by Matthias Green, David Sumpter and Ágúst Pálmason Morthens. 
+The pass analysis tool displays contribution plots from three different models—Logistic Regression, explainable Neural Networks (xNN), and XGBoost—showing how various features influence each model's xT prediction. It then generates AI-powered commentary explaining the pass in context, allowing comparison of how different models interpret the same event. 
 
 ## Usage
 
