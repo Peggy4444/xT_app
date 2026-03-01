@@ -810,8 +810,8 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
         team = filtered_pass.iloc[0].get('team_name', 'Unknown')
         player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
         
-        # Get xT value
-        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        # Get xT value (Logistic model uses 'xT' column)
+        xt_value = filtered_contrib.iloc[0].get('xT', 'N/A')
         if isinstance(xt_value, (int, float)):
             xt_value = f"{xt_value:.3f}"
         
