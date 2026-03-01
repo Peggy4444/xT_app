@@ -206,6 +206,16 @@ with tab1:
     chat.state = "default"
     chat.display_messages()
 
+    # Show full OpenAI prompt
+    with st.expander("View Full OpenAI Prompt", expanded=False):
+        st.markdown("**Messages sent to OpenAI:**")
+        for i, msg in enumerate(descriptions.messages):
+            role = msg.get('role', 'unknown')
+            content = msg.get('content', '')
+            st.markdown(f"**Message {i+1} - Role: {role}**")
+            st.text(content)
+            st.divider()
+
     # Model information at bottom
     with st.expander("Logistic Regression Model Details", expanded=False):
         model = Passes.load_model_logistic(selected_competition, show_summary=True)
@@ -335,6 +345,16 @@ with tab2:
     chat.state = "default"
     chat.display_messages()
 
+    # Show full OpenAI prompt
+    with st.expander("View Full OpenAI Prompt", expanded=False):
+        st.markdown("**Messages sent to OpenAI:**")
+        for i, msg in enumerate(descriptions.messages):
+            role = msg.get('role', 'unknown')
+            content = msg.get('content', '')
+            st.markdown(f"**Message {i+1} - Role: {role}**")
+            st.text(content)
+            st.divider()
+
     # Model information at bottom
     with st.expander("xNN Model Details", expanded=False):
         st.markdown("**Feature-based Models:**")
@@ -444,7 +464,18 @@ with tab3:
     if summaries:
         chat.add_message(summaries)
 
+    chat.state = "default"
     chat.display_messages()
+
+    # Show full OpenAI prompt
+    with st.expander("View Full OpenAI Prompt", expanded=False):
+        st.markdown("**Messages sent to OpenAI:**")
+        for i, msg in enumerate(descriptions.messages):
+            role = msg.get('role', 'unknown')
+            content = msg.get('content', '')
+            st.markdown(f"**Message {i+1} - Role: {role}**")
+            st.text(content)
+            st.divider()
 
     # Model information at bottom
     with st.expander("XGBoost Model Details", expanded=False):

@@ -576,7 +576,7 @@ class PassDescription_xNN(Description):
             if passes.empty:
                 raise ValueError(f"No shot found with ID {self.shot_id}")
             
-            player_name = passes['passer_name'].iloc[0]
+            player_name = passes['passer_name'].iloc[0].title()
             team_name = passes['team_name'].iloc[0]
             xT = contributions['xT_predicted'].iloc[0]
             x = passes['passer_x'].iloc[0]

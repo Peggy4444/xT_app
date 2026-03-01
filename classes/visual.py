@@ -799,20 +799,35 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib.iloc[0][metrics].round(2)
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.df_contributions)
+        pass_positions = list(self.df_contributions["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -836,21 +851,35 @@ class PassContributionPlot_Logistic(Distributionplot_xnn_models):
 
     def add_passes(self, df_passes, metrics, selected_pass_id):
         hover_texts = []
+        total_passes = len(self.df_contributions)
 
-        for _, row in self.df_contributions.iterrows():
+        for idx, row in enumerate(self.df_contributions.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            pass_number = selected_pass_id
-            hover_text.append(f"Pass #{pass_id}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = df_passes[df_passes["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value (try different column names)
+                xt_value = contrib_row.get('xT', contrib_row.get('xT_predicted', 'N/A'))
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 
@@ -1009,30 +1038,41 @@ class PassContributionPlot_Xnn(xnn_plot):
         filtered_contrib = df_xnn_contrib[df_xnn_contrib["id"] == pass_id]
         filtered_pass = df_passes_xnn[df_passes_xnn["id"] == pass_id]
 
-        feature_columns = [m.replace("_contribution", "") for m in metrics]
-        contributions = filtered_contrib.iloc[0][metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
         if filtered_contrib.empty or filtered_pass.empty:
             raise ValueError(f"Pass ID {pass_id} not found.")
         if len(filtered_contrib) > 1 or len(filtered_pass) > 1:
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib.iloc[0][metrics]
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.df_xnn_contrib)
+        pass_positions = list(self.df_xnn_contrib["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1069,21 +1109,35 @@ class PassContributionPlot_Xnn(xnn_plot):
 
     def add_passes(self, df_passes_xnn , metrics):
         hover_texts = []
+        total_passes = len(self.df_xnn_contrib)
 
-        for _, row in self.df_xnn_contrib.iterrows():
+        for idx, row in enumerate(self.df_xnn_contrib.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            #pass_number = selected_pass_id
-            hover_text.append(f"Pass #{pass_id}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = df_passes_xnn[df_passes_xnn["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value
+                xt_value = contrib_row.get('xT_predicted', 'N/A')
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 
@@ -1149,20 +1203,35 @@ class model_contribution_xnn(Distributionplot_xnn_models):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib_xnn.iloc[0][metrics_model]
-        feature_columns = [metric.replace("_contrib", "") for metric in metrics_model]
-        feature_values = filtered_pass_xnn.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.xnn_models_contrib)
+        pass_positions = list(self.xnn_models_contrib["id"])
+        pass_index = pass_positions.index(selected_pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass_xnn.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass_xnn.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass_xnn.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib_xnn.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1278,20 +1347,35 @@ class PassContributionPlot_Logistic_pressure(Distributionplot_xnn_models):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib_pressure.iloc[0][metrics]
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass_pressure.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.df_contributions_pressure)
+        pass_positions = list(self.df_contributions_pressure["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass_pressure.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass_pressure.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass_pressure.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib_pressure.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1332,21 +1416,35 @@ class PassContributionPlot_Logistic_pressure(Distributionplot_xnn_models):
 
     def add_passes(self, df_passes, metrics, selected_pass_id):
         hover_texts = []
+        total_passes = len(self.df_contributions_pressure)
 
-        for _, row in self.df_contributions_pressure.iterrows():
+        for idx, row in enumerate(self.df_contributions_pressure.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            #pass_number = selected_pass_id
-            hover_text.append(f"Pass #{pass_id}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = df_passes[df_passes["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value
+                xt_value = contrib_row.get('xT_predicted', 'N/A')
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 
@@ -1400,20 +1498,35 @@ class PassContributionPlot_Logistic_speed(Distributionplot_xnn_models):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib.iloc[0][metrics]
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.df_contributions_speed)
+        pass_positions = list(self.df_contributions_speed["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1438,21 +1551,35 @@ class PassContributionPlot_Logistic_speed(Distributionplot_xnn_models):
 
     def add_passes(self, df_passes, metrics, selected_pass_id):
         hover_texts = []
+        total_passes = len(self.df_contributions_speed)
 
-        for _, row in self.df_contributions_speed.iterrows():
+        for idx, row in enumerate(self.df_contributions_speed.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            #pass_number = selected_pass_id
-            hover_text.append(f"Pass #{pass_id}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = df_passes[df_passes["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value
+                xt_value = contrib_row.get('xT_predicted', 'N/A')
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 
@@ -1515,20 +1642,35 @@ class PassContributionPlot_Logistic_position(Distributionplot_xnn_models):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib.iloc[0][metrics]
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.df_contributions_position)
+        pass_positions = list(self.df_contributions_position["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1557,21 +1699,35 @@ class PassContributionPlot_Logistic_position(Distributionplot_xnn_models):
 
     def add_passes(self, df_passes, metrics,pass_id):
         hover_texts = []
+        total_passes = len(self.df_contributions_position)
 
-        for _, row in self.df_contributions_position.iterrows():
+        for idx, row in enumerate(self.df_contributions_position.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            #pass_number = selected_pass_id
-            hover_text.append(f"Pass #{pass_id}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = df_passes[df_passes["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value
+                xt_value = contrib_row.get('xT_predicted', 'N/A')
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 
@@ -1625,20 +1781,35 @@ class PassContributionPlot_Logistic_event(Distributionplot_xnn_models):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib.iloc[0][metrics]
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.df_contributions_event)
+        pass_positions = list(self.df_contributions_event["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1664,21 +1835,35 @@ class PassContributionPlot_Logistic_event(Distributionplot_xnn_models):
 
     def add_passes(self, df_passes, metrics, selected_pass_id):
         hover_texts = []
+        total_passes = len(self.df_contributions_event)
 
-        for _, row in self.df_contributions_event.iterrows():
+        for idx, row in enumerate(self.df_contributions_event.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            #pass_number = selected_pass_id
-            hover_text.append(f"Pass #{pass_id}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = df_passes[df_passes["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value
+                xt_value = contrib_row.get('xT_predicted', 'N/A')
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 
@@ -1887,20 +2072,35 @@ class PassContributionPlot_XGBoost(DistributionPlot_XGBoost):
             raise ValueError(f"Multiple rows found for Pass ID {pass_id}.")
 
         contributions = filtered_contrib.iloc[0][metrics]
-        feature_columns = [metric.replace("_contribution", "") for metric in metrics]
-        feature_values = filtered_pass.iloc[0][feature_columns]
-
-        # Construct hover text
-        hover_text = [f"Pass ID: {selected_pass_id}"]
-        for feature_column in feature_columns:
-            feature_value = feature_values[feature_column]
-            hover_text.append(f"{format_metric(feature_column)}: {feature_value:.2f}")
+        
+        # Calculate estimated minute
+        total_passes = len(self.feature_contrib_df)
+        pass_positions = list(self.feature_contrib_df["id"])
+        pass_index = pass_positions.index(pass_id)
+        estimated_minute = int((pass_index / total_passes * 90))
+        
+        # Get team and player
+        team = filtered_pass.iloc[0].get('team_name', 'Unknown')
+        player = filtered_pass.iloc[0].get('passer_name', 'Unknown').title() if pd.notna(filtered_pass.iloc[0].get('passer_name')) else 'Unknown'
+        
+        # Get xT value
+        xt_value = filtered_contrib.iloc[0].get('xT_predicted', 'N/A')
+        if isinstance(xt_value, (int, float)):
+            xt_value = f"{xt_value:.3f}"
+        
+        # Construct hover text with only Team, Player, Time, xT
+        hover_text = [
+            f"Team: {team}",
+            f"Player: {player}",
+            f"Time: {estimated_minute}'",
+            f"xT: {xt_value}"
+        ]
 
         # Add contributions to the plot
         self.add_data_point(
             ser_plot=contributions,
             plots="",
-            name=f"Pass #{selected_pass_id}",
+            name=f"{player} - {estimated_minute}' | xT: {xt_value}",
             hover="",
             hover_string="<br>".join(hover_text)
         )
@@ -1928,21 +2128,35 @@ class PassContributionPlot_XGBoost(DistributionPlot_XGBoost):
 
     def add_passes(self, pass_df_xgboost, metrics, selected_pass_id):
         hover_texts = []
+        total_passes = len(self.feature_contrib_df)
 
-        for _, row in self.feature_contrib_df.iterrows():
+        for idx, row in enumerate(self.feature_contrib_df.iterrows()):
+            _, contrib_row = row
             hover_text = []
-            pass_id = row["id"]
-            pass_number = selected_pass_id
-            #hover_text.append(f"Pass #{pass_number}")
+            pass_id = contrib_row["id"]
+            
+            # Get pass features
             pass_features = pass_df_xgboost[pass_df_xgboost["id"] == pass_id]
             if not pass_features.empty:
                 pass_features = pass_features.iloc[0]
-
-                for metric in metrics:
-                    feature_column = metric.replace("_contribution", "")
-                    if feature_column in pass_features:
-                        value = pass_features[feature_column]
-                        hover_text.append(f"{format_metric(feature_column)}: {value:.2f}")
+                
+                # Calculate estimated minute
+                estimated_minute = int((idx / total_passes * 90))
+                
+                # Get team and player
+                team = pass_features.get('team_name', 'Unknown')
+                player = pass_features.get('passer_name', 'Unknown').title() if pd.notna(pass_features.get('passer_name')) else 'Unknown'
+                
+                # Get xT value
+                xt_value = contrib_row.get('xT_predicted', 'N/A')
+                if isinstance(xt_value, (int, float)):
+                    xt_value = f"{xt_value:.3f}"
+                
+                # Simple hover: Team, Player, Time, xT only
+                hover_text.append(f"Team: {team}")
+                hover_text.append(f"Player: {player}")
+                hover_text.append(f"Time: {estimated_minute}'")
+                hover_text.append(f"xT: {xt_value}")
             else:
                 hover_text.append("No matching pass data")
 

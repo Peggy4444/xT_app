@@ -774,18 +774,26 @@ def describe_pass_features_logistic(features, competition):
 
     # --- Start angle & distance to goal ---
     dist_to_goal = round(features['start_distance_to_goal'] - features['end_distance_to_goal'])  # net distance toward goal
+    
+    # Determine direction text
+    if dist_to_goal > 0:
+        direction_text = f"moving the ball {dist_to_goal} metres nearer to goal"
+    elif dist_to_goal < 0:
+        direction_text = f"moving the ball {abs(dist_to_goal)} metres away from goal"
+    else:
+        direction_text = "with no net change in distance to goal"
 
     if features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[4]:
         descriptions.append(
-            f" with a narrow angle, covering around {dist_to_goal} metres and moving the ball toward the goal area."
+            f" with a narrow angle, {direction_text}."
         )
     elif features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[5]:
         descriptions.append(
-            f" with a moderate angle, covering around {dist_to_goal} metres toward the goal area."
+            f" with a moderate angle, {direction_text}."
         )
     else:
         descriptions.append(
-            f" with a wide angle, covering around {dist_to_goal} metres and moving the ball toward the goal area."
+            f" with a wide angle, {direction_text}."
         )
 
     # --- Teammates / opponents beyond the passer ---
@@ -1262,7 +1270,7 @@ feature_name_mapping_logistic = {
     "opponents_nearby": "the number of opponents close to the passer",
     "opponents_between": "the number of opponents in the passing lane",
     "pass_length": "the length of the pass",
-    "pass_angle": "the direction of the pass relative to the goal",
+    "pass_angle": "the direction of the pass measured counter-clockwise from the positive x-axis (0-360 degrees)",
     "start_angle_to_goal": "the angle from the passer to the goal",
     "end_angle_to_goal": "the angle from the receiver to the goal",
     "packing": "the number of opponents bypassed by the pass",
