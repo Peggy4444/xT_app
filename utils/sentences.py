@@ -785,15 +785,15 @@ def describe_pass_features_logistic(features, competition):
 
     if features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[4]:
         descriptions.append(
-            f" with a narrow angle, {direction_text}."
+            f" with a narrow angle of the start point to the goal posts, {direction_text}."
         )
     elif features['start_angle_to_goal'] <= thresholds['start_angle_to_goal'].iloc[5]:
         descriptions.append(
-            f" with a moderate angle, {direction_text}."
+            f" with a moderate angle of the start point to the goal posts, {direction_text}."
         )
     else:
         descriptions.append(
-            f" with a wide angle, {direction_text}."
+            f" with a wide angle of the start point to the goal posts, {direction_text}."
         )
 
     # --- Teammates / opponents beyond the passer ---

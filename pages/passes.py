@@ -168,6 +168,7 @@ tab1, tab2, tab3= st.tabs(["Logistic Regression", "xNN", "XGBoost"])
 with tab1:
     pass_df_logistic = pass_df.drop(['h1','h2','h3','h4'],axis=1)
     df_contributions = pass_data.df_contributions
+    st.write(pass_df_logistic)
 
     excluded_columns = ['xT','id', 'match_id']
     metrics = [col for col in df_contributions.columns if col not in excluded_columns]

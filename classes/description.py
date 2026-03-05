@@ -529,11 +529,12 @@ class PassDescription_logistic(Description):
                 "You are given a description of a single pass and its context. "
                 "Your task is to write a two-sentence summary of this pass.\n\n"
                 "Guidelines:\n"
-                "- In the first sentence should describe the pass in terms of how it moved the ball, whether it was under pressure, how it by passed players and the speed of play at the time it was taken. \n"
-                "- The second sentence should highlight what aspects made the pass more or less dangerous.\n"
+                "- In the first sentence should describe the pass features. \n"
+                "- The second sentence should highlight what aspect made the pass more or less dangerous.\n"
                 "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
                 "Use natural football terms instead.\n"
                 "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
+                "- Be short and right to the point"
             )
             return [{"role": "user", "content": prompt}]
         
@@ -660,11 +661,12 @@ class PassDescription_xNN(Description):
                 "You are given a description of a single pass and its context. "
                 "Your task is to write a two-sentence summary of this pass.\n\n"
                 "Guidelines:\n"
-                "- In the first sentence should describe the pass in terms of how it moved the ball, whether it was under pressure, how it by passed players and the speed of play at the time it was taken. \n"
-                "- The second sentence should highlight what aspects made the pass more or less dangerous.\n"
+                "- In the first sentence should describe the pass features. \n"
+                "- The second sentence should highlight what aspect made the pass more or less dangerous.\n"
                 "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
                 "Use natural football terms instead.\n"
                 "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
+                "- Be short and right to the point"
             )
             return [{"role": "user", "content": prompt}]
 
@@ -777,20 +779,6 @@ class PassDescription_xgboost(Description):
             
             return pass_description
 
-            # feature_descriptions = sentences.describe_pass_features(pass_features, self.competition)
-            
-            # pass_description = (
-            #     f"The pass is a {pass_type} originated from {sentences.describe_position_pass(x,y,team_direction)} \n and the passer is {player_name} from {team_name} team."
-            #     f"{sentences.describe_xT_pass_xgboost(xT,xG)}"
-            # )
-            # pass_description += '\n'.join(feature_descriptions) + '\n'  # Add the detailed descriptions of the shot features
-
-            # pass_description += '\n' + sentences.describe_pass_contributions_xgboost(contributions, pass_features)
-
-            # with st.expander("Synthesized Text"):
-            #     st.write(pass_description)
-            
-            # return pass_description 
 
 
         def get_prompt_messages(self):
@@ -800,11 +788,12 @@ class PassDescription_xgboost(Description):
                 "You are given a description of a single pass and its context. "
                 "Your task is to write a two-sentence summary of this pass.\n\n"
                 "Guidelines:\n"
-                "- In the first sentence should describe the pass in terms of how it moved the ball, whether it was under pressure, how it by passed players and the speed of play at the time it was taken. \n"
-                "- The second sentence should highlight what aspects made the pass more or less dangerous.\n"
+                "- In the first sentence should describe the pass features. \n"
+                "- The second sentence should highlight what aspect made the pass more or less dangerous.\n"
                 "- Never mention raw feature or variable names (such as 'end_distance_to_sideline' or 'opponents_beyond'). "
                 "Use natural football terms instead.\n"
                 "- Do not include any code or technical notation. Use only football and tactical language, and avoid unnecessary decimals."
+                "- Be short and right to the point"
             )
             return [{"role": "user", "content": prompt}]
     
