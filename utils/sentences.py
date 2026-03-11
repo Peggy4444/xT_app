@@ -99,18 +99,7 @@ def describe_xT_pass(xT,xG):
     return description
 
 
-def describe_xT_pass_1(xT,xG):
-    if xG != 0:
-        if xT <= 0.05178240314126015:
-            description = f"It had low xT {xT} value and probability of pass being a shot was {xT * 100:.0f}%. There is less chances for it to be a safe pass creating less goal scoring opportunities."
-        elif xT < 0.06652335822582245:
-            description = f" It had moderate xT {xT} value and probability of pass being a shot was {xT * 100:.0f}%. There is moderate chances of being a safe pass creating moderate goal scoring opportunities."
-        else:
-            description = f" It had high xT {xT} value and probability of pass being a shot was {xT * 100:.0f}% with xG value is {xG:.3f}. There is high chances of being a dangerous pass creating high goal scoring opportunities."   
-            
-    else:
-        description = f" The xT value is {xT} and it did not lead to a shot, opportunities to score goal is less and was a safe pass."
-    return description
+
 
 
 
@@ -210,9 +199,15 @@ def describe_models_xNN(pressure, speed, position, event):
      
 
 def describe_xT_pass_xNN(xT, xG):
-    xt_percentile_25 = 0.05178240314126015
-    xt_percentile_50 = 0.06115284748375416
-    xt_percentile_75 = 0.06652335822582245
+    # xt_percentile_25 = 0.05178240314126015
+    # xt_percentile_50 = 0.06115284748375416
+    # xt_percentile_75 = 0.06652335822582245
+    # xg_threshold = 0.066100
+    
+
+    xt_percentile_25 = 0.05882884
+    xt_percentile_50 = 0.079879159
+    xt_percentile_75 = 0.130563166
     xg_threshold = 0.066100
 
     xt_label = ""
@@ -247,9 +242,14 @@ def describe_xT_pass_xNN(xT, xG):
 
 def describe_xT_pass_xgboost(xT, xG):
     # Define percentile thresholds
-    xt_percentile_25 = -0.02270895206738621
-    xt_percentile_50 = -0.000917316022228995
-    xt_percentile_75 = 0.026505677450064418
+    # xt_percentile_25 = -0.02270895206738621
+    # xt_percentile_50 = -0.000917316022228995
+    # xt_percentile_75 = 0.026505677450064418
+    # xg_threshold = 0.066100
+
+    xt_percentile_25 = 0.05882884
+    xt_percentile_50 = 0.079879159
+    xt_percentile_75 = 0.130563166
     xg_threshold = 0.066100
 
     # Assign xT level label
